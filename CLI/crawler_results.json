@@ -5,7 +5,7 @@
     "meta_description": "No description",
     "headers": [],
     "status_code": 200,
-    "crawled_at": "2024-12-20T19:21:56.605390"
+    "crawled_at": "2024-12-20T19:38:29.198346"
   },
   {
     "url": "http://127.0.0.1/classic/",
@@ -13,7 +13,7 @@
     "meta_description": "No description",
     "headers": [],
     "status_code": 200,
-    "crawled_at": "2024-12-20T19:21:56.611912"
+    "crawled_at": "2024-12-20T19:38:29.203345"
   },
   {
     "url": "http://127.0.0.1/classic/test-01.php",
@@ -23,7 +23,7 @@
       "Query Parameters"
     ],
     "status_code": 200,
-    "crawled_at": "2024-12-20T19:21:56.617415"
+    "crawled_at": "2024-12-20T19:38:29.207347"
   },
   {
     "url": "http://127.0.0.1/classic/test-02.php",
@@ -33,7 +33,7 @@
       "Classic Forms"
     ],
     "status_code": 200,
-    "crawled_at": "2024-12-20T19:21:56.624950"
+    "crawled_at": "2024-12-20T19:38:29.229349"
   },
   {
     "url": "http://127.0.0.1/classic/test-03.php",
@@ -43,6 +43,6 @@
       "Classic File Uploads"
     ],
     "status_code": 200,
-    "crawled_at": "2024-12-20T19:21:56.652017"
+    "crawled_at": "2024-12-20T19:38:29.234360"
   }
 ]
