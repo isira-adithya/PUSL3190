@@ -18,6 +18,7 @@ class WebCrawler:
         self.console = Console()
         self.progress: Optional[Progress] = None
         self.tasks: Dict[str, TaskID] = {}
+        self.identified_forms = []
         
     def is_valid_url(self, url: str) -> bool:
         """Check if URL is valid and belongs to the same domain."""
@@ -84,7 +85,7 @@ class WebCrawler:
             # Identify Forms
             html_parser = HTMLParser(url, response.text)
             identified_forms = html_parser.process()
-            # print(identified_forms)
+            self.identified_forms.extend(identified_forms)
             
             # Extract and store page information
             page_info = self.extract_page_info(url, response)

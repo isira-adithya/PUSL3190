@@ -5,7 +5,7 @@
     "meta_description": "No description",
     "headers": [],
     "status_code": 200,
-    "crawled_at": "2024-12-20T18:53:42.401988"
+    "crawled_at": "2024-12-20T19:21:56.605390"
   },
   {
     "url": "http://127.0.0.1/classic/",
@@ -13,7 +13,7 @@
     "meta_description": "No description",
     "headers": [],
     "status_code": 200,
-    "crawled_at": "2024-12-20T18:53:42.407494"
+    "crawled_at": "2024-12-20T19:21:56.611912"
   },
   {
     "url": "http://127.0.0.1/classic/test-01.php",
@@ -23,17 +23,7 @@
       "Query Parameters"
     ],
     "status_code": 200,
-    "crawled_at": "2024-12-20T18:53:42.413494"
-  },
-  {
-    "url": "http://127.0.0.1/classic/test-03.php",
-    "title": "Classic Test Case 03 - BXSS Playground",
-    "meta_description": "No description",
-    "headers": [
-      "Classic File Uploads"
-    ],
-    "status_code": 200,
-    "crawled_at": "2024-12-20T18:53:42.419014"
+    "crawled_at": "2024-12-20T19:21:56.617415"
   },
   {
     "url": "http://127.0.0.1/classic/test-02.php",
@@ -43,6 +33,16 @@
       "Classic Forms"
     ],
     "status_code": 200,
-    "crawled_at": "2024-12-20T18:53:42.425522"
+    "crawled_at": "2024-12-20T19:21:56.624950"
+  },
+  {
+    "url": "http://127.0.0.1/classic/test-03.php",
+    "title": "Classic Test Case 03 - BXSS Playground",
+    "meta_description": "No description",
+    "headers": [
+      "Classic File Uploads"
+    ],
+    "status_code": 200,
+    "crawled_at": "2024-12-20T19:21:56.652017"
   }
 ]
