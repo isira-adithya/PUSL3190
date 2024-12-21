@@ -49,6 +49,11 @@ def crawl(
         crawler.crawl(url)
         
     console.print(f"\n[green]Crawling completed! Found {len(crawler.results)} pages.[/green]")
+
+    # Send payloads to identified forms
+    identified_forms = crawler.identified_forms
+    console.print(f"[green]Identified {len(identified_forms)} forms. Sending payloads...[/green]")
+    print(identified_forms)
     
     # Export results
     ResultExporter.export_json(crawler.results, output)
