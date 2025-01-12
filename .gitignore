@@ -1,2 +1,3 @@
 *.pyc
-tests/logs/
+tests/logs/*.log
+tests/logs/*.json
