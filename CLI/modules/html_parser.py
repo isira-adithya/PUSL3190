@@ -68,7 +68,10 @@ class HTMLParser:
         for form in forms:
             form_processor = FormProcessor(form)
             form_processor.process()
+            # every form's url in form_processor.form_data should be absolute
+            form_processor.form_data['url'] = self.convert_to_absolute_url(form_processor.form_data['url'], self.url, self.url_schema)
             self.forms_data.append(form_processor.form_data)
+            
         links = self.find_links()
 
         return self.forms_data
