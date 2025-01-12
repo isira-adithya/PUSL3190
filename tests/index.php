@@ -1,4 +1,3 @@
-<?php include './middlewares/logger.php'; ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>

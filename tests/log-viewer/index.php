@@ -30,11 +30,11 @@ class LogViewer {
         $output = '<div class="json-formatter">';
         foreach ($data as $key => $value) {
             $output .= '<div class="json-line">';
-            $output .= '<span class="json-key">' . htmlspecialchars($key) . ':</span> ';
+            $output .= '<span class="json-key">' . $key . ':</span> ';
             if (is_array($value)) {
                 $output .= $this->formatJson($value);
             } else {
-                $output .= '<span class="json-value">"' . htmlspecialchars($value) . '"</span>';
+                $output .= '<span class="json-value">"' . $value . '"</span>';
             }
             $output .= '</div>';
         }
@@ -46,7 +46,6 @@ class LogViewer {
 $viewer = new LogViewer();
 $logs = $viewer->getLogs();
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -131,7 +130,7 @@ $logs = $viewer->getLogs();
                                     <?php foreach ($logs as $log): ?>
                                         <tr>
                                             <td><?php echo htmlspecialchars($log['timestamp']); ?></td>
-                                            <td class="truncate"><?php echo htmlspecialchars($log['uri']); ?></td>
+                                            <td class="truncate"><?php echo $log['uri']; ?></td>
                                             <td class="data-cell">
                                                 <div class="truncate toggle-data" onclick="this.classList.toggle('expanded')">
                                                     <?php echo $viewer->formatJson($log['get_data'] ?? []); ?>
