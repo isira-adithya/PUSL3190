@@ -7,6 +7,7 @@ class FormProcessor:
         url = form['action']
         method = form['method']
         inputs = form.find_all('input')
+        content_type = form.get('enctype', 'application/x-www-form-urlencoded')
         form_data = {}
         for inp in inputs:
             name = inp.get('name')
@@ -15,7 +16,8 @@ class FormProcessor:
         self.form_data = {
             'url': url,
             'method': method,
-            'data': form_data
+            'data': form_data,
+            'content_type': content_type
         }
 
     def process(self):
