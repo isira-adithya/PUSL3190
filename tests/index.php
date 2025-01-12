@@ -1,3 +1,4 @@
+<?php include './middlewares/logger.php'; ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,7 +8,6 @@
 </head>
 <body>
     <a href="/classic/">Classic Web</a> <br>
-    <a href="">Modern Web (VueJS, React, Angular, etc)</a> <br>
-    <a href="/phishing.html">{Phishing Sample}</a> <br>
+    <a href="">Modern Technologies (VueJS, React, Angular, etc)</a> <br>
 </body>
 </html>
