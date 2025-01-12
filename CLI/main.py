@@ -5,8 +5,10 @@ import validators
 from pathlib import Path
 from modules.web_crawler import WebCrawler
 from modules.result_exporter import ResultExporter
+from modules.config import Config
+from modules.payload_generator import PayloadGenerator
 
-
+config = Config()
 app = typer.Typer(help="Blind XSS Payload Sender CLI")
 
 @app.command()
@@ -23,6 +25,8 @@ def crawl(
     Crawl a website starting from the given URL and save the results to a JSON file.
     """
     console = Console()
+    payload_generator = PayloadGenerator()
+    payload_generator.generate_payloads()
     
     if not validators.url(url):
         console.print("[red]Invalid URL provided. Please enter a valid URL.[/red]")
