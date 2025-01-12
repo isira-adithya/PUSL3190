@@ -7,6 +7,7 @@
     <title>Blind XSS Playground</title>
 </head>
 <body>
+    <a href="/log-viewer/">Log Viewer</a> <br>
     <a href="/classic/">Classic Web</a> <br>
     <a href="">Modern Technologies (VueJS, React, Angular, etc)</a> <br>
 </body>
