@@ -1,4 +1,12 @@
 <?php
+
+if (isset($_POST['clear']) && ($_POST['clear'] == '1')) {
+    $logFile = realpath($_SERVER["DOCUMENT_ROOT"]) . '/logs/middlewares.json';
+    file_put_contents($logFile, '[]');
+    echo "1";
+    exit;
+}
+
 class LogViewer {
     private $logFile;
 
@@ -97,7 +105,8 @@ $logs = $viewer->getLogs();
     <div class="page-content">
         <div class="row">
             <div class="col-12">
-                <a href="/" class="btn btn-primary">&larr; Go Back</a>
+                <a href="/" class="btn btn-primary bg-info">↩️ Go Back</a>
+                <a onclick="resetLogs()" class="btn btn-primary bg-danger">🗑️ Clear Logs</a>
                 <div class="u-text-center u-my-4">
                     <h1 class="title">Log Viewer</h1>
                     <p class="subtitle">Showing latest <?php echo count($logs); ?> records</p>
@@ -148,5 +157,22 @@ $logs = $viewer->getLogs();
             </div>
         </div>
     </div>
+    <script>
+        function resetLogs(){
+            if (confirm('Are you sure you want to clear logs?')) {
+                fetch('.', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'clear=1'
+                }).then(() => {
+                    window.location.reload();
+                }).catch(() => {
+                    alert('Failed to clear logs.');
+                });
+            }
+        }
+    </script>
 </body>
 </html>
