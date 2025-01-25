@@ -7,6 +7,7 @@ from modules.web_crawler import WebCrawler
 from modules.result_exporter import ResultExporter
 from modules.config import Config
 from modules.payload_generator import PayloadGenerator
+from modules.payload_spray import PayloadSpray
 
 config = Config()
 app = typer.Typer(help="Blind XSS Payload Sender CLI")
@@ -54,10 +55,20 @@ def crawl(
         
     console.print(f"\n[green]Crawling completed! Found {len(crawler.results)} pages.[/green]")
 
-    # Send payloads to identified forms
+    # identified forms
     identified_forms = crawler.identified_forms
     console.print(f"[green]Identified {len(identified_forms)} forms. Sending payloads...[/green]")
-    print(identified_forms)
+    
+    # spray payloads
+    payloads = payload_generator.get_payloads()
+    for target in identified_forms:
+        for payload in payloads:
+            payloadSprayObj = PayloadSpray(payload=payload, target=target)
+            result = payloadSprayObj.run()
+            print(result)
+
+        
+
     
     # Export results
     ResultExporter.export_json(crawler.results, output)
