@@ -66,9 +66,6 @@ def crawl(
             payloadSprayObj = PayloadSpray(payload=payload, target=target)
             result = payloadSprayObj.run()
             print(result)
-
-        
-
     
     # Export results
     ResultExporter.export_json(crawler.results, output)

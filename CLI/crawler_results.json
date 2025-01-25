@@ -5,25 +5,7 @@
     "meta_description": "No description",
     "headers": [],
     "status_code": 200,
-    "crawled_at": "2025-01-25T20:10:42.700539"
-  },
-  {
-    "url": "http://localtest.me/log-viewer/",
-    "title": "Log Viewer",
-    "meta_description": "No description",
-    "headers": [
-      "Log Viewer"
-    ],
-    "status_code": 200,
-    "crawled_at": "2025-01-25T20:10:42.740927"
-  },
-  {
-    "url": "http://localtest.me/",
-    "title": "Blind XSS Playground",
-    "meta_description": "No description",
-    "headers": [],
-    "status_code": 200,
-    "crawled_at": "2025-01-25T20:10:42.767452"
+    "crawled_at": "2025-01-26T00:39:34.746795"
   },
   {
     "url": "http://localtest.me/classic/",
@@ -31,27 +13,7 @@
     "meta_description": "No description",
     "headers": [],
     "status_code": 200,
-    "crawled_at": "2025-01-25T20:10:42.772452"
-  },
-  {
-    "url": "http://localtest.me/classic/test-03.php",
-    "title": "Classic Test Case 03 - BXSS Playground",
-    "meta_description": "No description",
-    "headers": [
-      "Classic File Uploads"
-    ],
-    "status_code": 200,
-    "crawled_at": "2025-01-25T20:10:42.800612"
-  },
-  {
-    "url": "http://localtest.me/classic/test-01.php",
-    "title": "Classic Test Case 01 - BXSS Playground",
-    "meta_description": "No description",
-    "headers": [
-      "Query Parameters"
-    ],
-    "status_code": 200,
-    "crawled_at": "2025-01-25T20:10:42.831528"
+    "crawled_at": "2025-01-26T00:39:34.756811"
   },
   {
     "url": "http://localtest.me/classic/test-02.php",
@@ -61,6 +23,44 @@
       "Classic Forms"
     ],
     "status_code": 200,
-    "crawled_at": "2025-01-25T20:10:42.854586"
+    "crawled_at": "2025-01-26T00:39:34.763826"
+  },
+  {
+    "url": "http://localtest.me/classic/test-03.php",
+    "title": "Classic Test Case 03 - BXSS Playground",
+    "meta_description": "No description",
+    "headers": [
+      "Classic File Uploads"
+    ],
+    "status_code": 200,
+    "crawled_at": "2025-01-26T00:39:34.770338"
+  },
+  {
+    "url": "http://localtest.me/",
+    "title": "Blind XSS Playground",
+    "meta_description": "No description",
+    "headers": [],
+    "status_code": 200,
+    "crawled_at": "2025-01-26T00:39:34.775845"
+  },
+  {
+    "url": "http://localtest.me/classic/test-01.php",
+    "title": "Classic Test Case 01 - BXSS Playground",
+    "meta_description": "No description",
+    "headers": [
+      "Query Parameters"
+    ],
+    "status_code": 200,
+    "crawled_at": "2025-01-26T00:39:34.799282"
+  },
+  {
+    "url": "http://localtest.me/log-viewer/",
+    "title": "Log Viewer",
+    "meta_description": "No description",
+    "headers": [
+      "Log Viewer"
+    ],
+    "status_code": 200,
+    "crawled_at": "2025-01-26T00:39:34.813799"
   }
 ]
