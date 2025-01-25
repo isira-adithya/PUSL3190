@@ -1,5 +1,7 @@
 <?php
 
+$isVulnerable = false;
+
 if (isset($_POST['clear']) && ($_POST['clear'] == '1')) {
     $logFile = realpath($_SERVER["DOCUMENT_ROOT"]) . '/logs/middlewares.json';
     file_put_contents($logFile, '[]');
@@ -7,8 +9,13 @@ if (isset($_POST['clear']) && ($_POST['clear'] == '1')) {
     exit;
 }
 
+if (isset($_GET['vulnerable']) && ($_GET['vulnerable'] == '1')) {
+    $isVulnerable = true;
+}
+
 class LogViewer {
     private $logFile;
+    public $isVulnerable = false;
 
     public function __construct() {
         $this->logFile = realpath($_SERVER["DOCUMENT_ROOT"]) . '/logs/middlewares.json';
@@ -29,12 +36,14 @@ class LogViewer {
         
         $output = '<div class="json-formatter">';
         foreach ($data as $key => $value) {
+            $key = $this->isVulnerable ? $key : htmlentities($key);
+            $value = $this->isVulnerable ? $value : htmlentities($value);
             $output .= '<div class="json-line">';
             $output .= '<span class="json-key">' . $key . ':</span> ';
             if (is_array($value)) {
                 $output .= $this->formatJson($value);
             } else {
-                $output .= '<span class="json-value">"' . $value . '"</span>';
+                $output .= '<span class="json-value">"' . $value  . '"</span>';
             }
             $output .= '</div>';
         }
@@ -44,6 +53,7 @@ class LogViewer {
 }
 
 $viewer = new LogViewer();
+$viewer->isVulnerable = $isVulnerable;
 $logs = $viewer->getLogs();
 ?>
 <!DOCTYPE html>
@@ -99,13 +109,38 @@ $logs = $viewer->getLogs();
             min-width: 200px;
         }
     </style>
+    <script>
+        function resetLogs(){
+            if (confirm('Are you sure you want to clear logs?')) {
+                fetch('.', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'clear=1'
+                }).then(() => {
+                    window.location.reload();
+                }).catch(() => {
+                    alert('Failed to clear logs.');
+                });
+            }
+        }
+    </script>
 </head>
 <body>
     <div class="page-content">
         <div class="row">
             <div class="col-12">
                 <a href="/" class="btn btn-primary bg-info">↩️ Go Back</a>
-                <a onclick="resetLogs()" class="btn btn-primary bg-danger">🗑️ Clear Logs</a>
+                <a onclick="resetLogs()" class="btn btn-primary bg-black">🗑️ Clear Logs</a>
+                <?php
+                    if ($isVulnerable) {
+                        echo '<a href="." class="btn btn-primary bg-info">🔒 Secure Mode</a>';
+                    } else {
+                        echo '<a href="?vulnerable=1" class="btn btn-primary bg-danger">🔓 Vulnerable Mode</a>';
+                    }
+                ?>
+                <p class="btn btn-white txt-black">Applcation Status: <?php $isVulnerable ? print("vulnerable") : print("Secure")  ?></p>
                 <div class="u-text-center u-my-4">
                     <h1 class="title">Log Viewer</h1>
                     <p class="subtitle">Showing latest <?php echo count($logs); ?> records</p>
@@ -129,8 +164,8 @@ $logs = $viewer->getLogs();
                                 <tbody>
                                     <?php foreach ($logs as $log): ?>
                                         <tr>
-                                            <td><?php echo htmlspecialchars($log['timestamp']); ?></td>
-                                            <td class="truncate"><?php echo $log['uri']; ?></td>
+                                            <td><?php echo $isVulnerable ? $log['timestamp'] : htmlspecialchars($log['timestamp']); ?></td>
+                                            <td class="truncate"><?php echo $isVulnerable ? $log['uri'] : htmlspecialchars($log['timestamp']); ?></td>
                                             <td class="data-cell">
                                                 <div class="truncate toggle-data" onclick="this.classList.toggle('expanded')">
                                                     <?php echo $viewer->formatJson($log['get_data'] ?? []); ?>
@@ -156,22 +191,5 @@ $logs = $viewer->getLogs();
             </div>
         </div>
     </div>
-    <script>
-        function resetLogs(){
-            if (confirm('Are you sure you want to clear logs?')) {
-                fetch('.', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: 'clear=1'
-                }).then(() => {
-                    window.location.reload();
-                }).catch(() => {
-                    alert('Failed to clear logs.');
-                });
-            }
-        }
-    </script>
 </body>
 </html>
