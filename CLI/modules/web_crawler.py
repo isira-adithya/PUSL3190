@@ -22,6 +22,7 @@ class WebCrawler:
         
     def is_valid_url(self, url: str) -> bool:
         """Check if URL is valid and belongs to the same domain."""
+        # Do not crawl external links which are out of scope! 
         if not validators.url(url):
             return False
         return urlparse(url).netloc == urlparse(self.base_url).netloc
@@ -70,7 +71,7 @@ class WebCrawler:
         self.visited_urls.add(url)
         
         try:
-            # Update progress
+            # update progress for the console
             if self.progress:
                 task_id = self.progress.add_task(
                     description=f"Crawling {url}", 
@@ -82,20 +83,20 @@ class WebCrawler:
             response = requests.get(url, timeout=10)
             response.raise_for_status()
 
-            # Identify Forms
+            # identify forms
             html_parser = HTMLParser(url, response.text)
             identified_forms = html_parser.process()
             self.identified_forms.extend(identified_forms)
             
-            # Extract and store page information
+            # extract page information
             page_info = self.extract_page_info(url, response)
             self.results.append(page_info)
             
-            # Complete the task for this URL
+            # mark as done in progress for the console
             if self.progress and url in self.tasks:
                 self.progress.update(self.tasks[url], visible=False)
             
-            # Get links and continue crawling
+            # get links and keep crawling
             links = self.get_links(url)
             for link in links:
                 self.crawl(link, depth + 1)
