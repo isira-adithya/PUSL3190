@@ -12,7 +12,11 @@ class FormProcessor:
         for inp in inputs:
             name = inp.get('name')
             value = inp.get('value', '')
-            form_data[name] = value
+            type = inp.get('type', 'text')
+            form_data[name] = {
+                'value': value,
+                'type': type
+            }
         self.form_data = {
             'url': url,
             'method': method,
