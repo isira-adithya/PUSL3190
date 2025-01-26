@@ -25,5 +25,16 @@ class PayloadSpray:
                 query = self.generate_query(self.target.get('data'))
                 result = requests.post(self.target.get('url'), data=query, headers={'User-Agent': self.payload, 'Content-Type': self.target.get('content_type')})
                 return result
+            elif self.target.get('content_type') == 'multipart/form-data':
+                multipart_form_data = {}
+                for key in self.target.get('data'):
+                    if (self.target.get('data')[key].get('type') == 'file'):
+                        multipart_form_data[key] = (key, self.payload.encode())
+                    else:
+                        multipart_form_data[key] = self.payload
+                result = requests.post(self.target.get('url'), files=multipart_form_data, headers={'User-Agent': self.payload})
+                pass
+            else:
+                print(self.target)
         else:
             print(self.target)
