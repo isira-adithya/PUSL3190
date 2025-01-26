@@ -5,7 +5,7 @@
     "meta_description": "No description",
     "headers": [],
     "status_code": 200,
-    "crawled_at": "2025-01-26T00:39:34.746795"
+    "crawled_at": "2025-01-26T20:57:54.334813"
   },
   {
     "url": "http://localtest.me/classic/",
@@ -13,17 +13,15 @@
     "meta_description": "No description",
     "headers": [],
     "status_code": 200,
-    "crawled_at": "2025-01-26T00:39:34.756811"
+    "crawled_at": "2025-01-26T20:57:54.342317"
   },
   {
-    "url": "http://localtest.me/classic/test-02.php",
-    "title": "Classic Test Case 02 - BXSS Playground",
+    "url": "http://localtest.me/",
+    "title": "Blind XSS Playground",
     "meta_description": "No description",
-    "headers": [
-      "Classic Forms"
-    ],
+    "headers": [],
     "status_code": 200,
-    "crawled_at": "2025-01-26T00:39:34.763826"
+    "crawled_at": "2025-01-26T20:57:54.359001"
   },
   {
     "url": "http://localtest.me/classic/test-03.php",
@@ -33,15 +31,7 @@
       "Classic File Uploads"
     ],
     "status_code": 200,
-    "crawled_at": "2025-01-26T00:39:34.770338"
-  },
-  {
-    "url": "http://localtest.me/",
-    "title": "Blind XSS Playground",
-    "meta_description": "No description",
-    "headers": [],
-    "status_code": 200,
-    "crawled_at": "2025-01-26T00:39:34.775845"
+    "crawled_at": "2025-01-26T20:57:54.365513"
   },
   {
     "url": "http://localtest.me/classic/test-01.php",
@@ -51,7 +41,17 @@
       "Query Parameters"
     ],
     "status_code": 200,
-    "crawled_at": "2025-01-26T00:39:34.799282"
+    "crawled_at": "2025-01-26T20:57:54.370515"
+  },
+  {
+    "url": "http://localtest.me/classic/test-02.php",
+    "title": "Classic Test Case 02 - BXSS Playground",
+    "meta_description": "No description",
+    "headers": [
+      "Classic Forms"
+    ],
+    "status_code": 200,
+    "crawled_at": "2025-01-26T20:57:54.377638"
   },
   {
     "url": "http://localtest.me/log-viewer/",
@@ -61,6 +61,16 @@
       "Log Viewer"
     ],
     "status_code": 200,
-    "crawled_at": "2025-01-26T00:39:34.813799"
+    "crawled_at": "2025-01-26T20:57:54.389147"
+  },
+  {
+    "url": "http://localtest.me/log-viewer/?vulnerable=1",
+    "title": "Log Viewer",
+    "meta_description": "No description",
+    "headers": [
+      "Log Viewer"
+    ],
+    "status_code": 200,
+    "crawled_at": "2025-01-26T20:57:54.413744"
   }
 ]
