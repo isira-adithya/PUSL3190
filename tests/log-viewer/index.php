@@ -37,6 +37,9 @@ class LogViewer {
         $output = '<div class="json-formatter">';
         foreach ($data as $key => $value) {
             $key = $this->isVulnerable ? $key : htmlentities($key);
+            if (gettype($value) != 'string') {
+                $value = json_encode($value);
+            }
             $value = $this->isVulnerable ? $value : htmlentities($value);
             $output .= '<div class="json-line">';
             $output .= '<span class="json-key">' . $key . ':</span> ';
