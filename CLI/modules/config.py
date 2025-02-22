@@ -12,15 +12,19 @@ class Config:
 
     def load(self, config_file=None):
         if (config_file is None):
-            # ~/.config/blind_xss_sender/config.json
-            config_file = os.path.join(Path.home(), '.config', 'blind_xss_sender', 'config.json')
+            # ~/.config/xsspecter/config.json
+            config_file = os.path.join(Path.home(), '.config', 'xsspecter', 'config.json')
             self.config_location = config_file
 
         if not os.path.exists(config_file):
             # Create the config directory and file if they don't exist
             os.makedirs(os.path.dirname(config_file), exist_ok=True)
             with open(config_file, 'w') as f:
-                json.dump(self.config, f, indent=4)
+                json.dump({
+                    "domain": self.domain,
+                    "max_depth": self.max_depth,
+                    "rate_limit": self.rate_limit
+                }, f, indent=4)
             return
         
         with open(config_file, 'r') as f:
