@@ -10,20 +10,23 @@ from modules.payload_generator import PayloadGenerator
 from modules.payload_spray import PayloadSpray
 
 config = Config()
-app = typer.Typer(help="Blind XSS Payload Sender CLI")
+app = typer.Typer(help="XSSpecter - CLI")
 
 @app.command()
-def crawl(
-    url: str = typer.Argument(..., help="The starting URL to crawl"),
+def spray(
+    url: str = typer.Argument(..., help="URL to spray payloads"),
     depth: int = typer.Option(2, help="Maximum crawling depth"),
     max_pages: int = typer.Option(100, help="Maximum number of pages to crawl"),
     output: Path = typer.Option(
-        "crawler_results.json",
-        help="Output file path for the crawling results"
+        "results.json",
+        help="Output file path"
+    ),
+    crawl: bool = typer.Option(
+        False, help="Crawl the website"
     )
 ):
     """
-    Crawl a website starting from the given URL and save the results to a JSON file.
+    Spray payloads to the given URL and save the results to a JSON file.
     """
     console = Console()
     payload_generator = PayloadGenerator()
@@ -33,13 +36,17 @@ def crawl(
         console.print("[red]Invalid URL provided. Please enter a valid URL.[/red]")
         raise typer.Exit(1)
     
-    console.print(f"[green]Starting crawler with the following configuration:[/green]")
+    console.print(f"[green]Starting with the following configuration:[/green]")
     console.print(f"URL: {url}")
-    console.print(f"Max Depth: {depth}")
-    console.print(f"Max Pages: {max_pages}")
+    if (crawl):
+        console.print(f"Crawling: [yellow]Enabled[/yellow]")
+        console.print(f"Max Depth: {depth}")
+        console.print(f"Max Pages: {max_pages}")
+    else:
+        console.print(f"Crawling: [red]Disabled[/red]")
     console.print(f"Output File: {output}")
     
-    crawler = WebCrawler(url, depth, max_pages)
+    crawler = WebCrawler(base_url=url, max_depth=depth, max_pages=max_pages, should_crawl=crawl)
     
     # Create a single progress instance for the entire crawling process
     progress = Progress(
@@ -53,7 +60,7 @@ def crawl(
         crawler.progress = progress  # Assign the progress instance to the crawler
         crawler.crawl(url)
         
-    console.print(f"\n[green]Crawling completed! Found {len(crawler.results)} pages.[/green]")
+    console.print(f"\n[green]Scan completed! Found {len(crawler.results)} pages.[/green]")
 
     # identified forms
     identified_forms = crawler.identified_forms

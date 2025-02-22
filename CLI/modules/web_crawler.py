@@ -9,7 +9,7 @@ from typing import Optional, Set, Dict
 from modules.html_parser import HTMLParser
 
 class WebCrawler:
-    def __init__(self, base_url: str, max_depth: int = 2, max_pages: int = 100):
+    def __init__(self, base_url: str, max_depth: int = 2, max_pages: int = 100, should_crawl: bool = False):
         self.base_url = base_url
         self.max_depth = max_depth
         self.max_pages = max_pages
@@ -19,6 +19,7 @@ class WebCrawler:
         self.progress: Optional[Progress] = None
         self.tasks: Dict[str, TaskID] = {}
         self.identified_forms = []
+        self.should_crawl = should_crawl
         
     def is_valid_url(self, url: str) -> bool:
         """Check if URL is valid and belongs to the same domain."""
@@ -98,8 +99,9 @@ class WebCrawler:
             
             # get links and keep crawling
             links = self.get_links(url)
-            for link in links:
-                self.crawl(link, depth + 1)
+            if (self.should_crawl):
+                for link in links:
+                    self.crawl(link, depth + 1)
                     
         except Exception as e:
             self.console.print(f"[red]Error crawling {url}: {str(e)}[/red]")

