@@ -1,10 +1,40 @@
 from modules.config import Config
 import requests
+from requests_toolbelt import MultipartEncoder
 
 class PayloadSpray:
     def __init__(self, payload, target):
         self.payload = payload
         self.target = target
+    
+    def send_multipart_form_data(self, url, data, files=None):
+        fields = {}
+        
+        # normal fields
+        for key, value in data.items():
+            fields[key] = (None, value, 'text/plain')
+        
+        # files
+        if files:
+            for field_name, file_path in files.items():
+                fields[field_name] = (file_path, self.payload, 'text/plain')
+        
+        # Create encoder
+        encoder = MultipartEncoder(fields=fields)
+        
+        # Send the request
+        response = requests.post(
+            url,
+            data=encoder,
+            headers={
+                'Accept': '*/*',
+                'Accept-Encoding': 'gzip, deflate',
+                'Connection': 'keep-alive',
+                'Content-Type': encoder.content_type
+            }
+        )
+        
+        return response
 
     def generate_query(self, data):
         # for data.key generate data.key=data.value&data.key=data.value
@@ -26,15 +56,14 @@ class PayloadSpray:
                 return result
             elif self.target.get('content_type') == 'multipart/form-data':
                 multipart_form_data = {}
+                multipart_file_names = {}
                 for key in self.target.get('data'):
                     if (self.target.get('data')[key].get('type') == 'file'):
-                        multipart_form_data[key] = (key, self.payload.encode())
+                        multipart_file_names[key] = self.payload
                     else:
                         multipart_form_data[key] = self.payload
-                result = requests.post(self.target.get('url'), files=multipart_form_data, headers={'User-Agent': self.payload})
-                result = requests.post('http://wjceertefxmhinlfdmditpdgr9l4sh27e.oast.fun', files=multipart_form_data, headers={'User-Agent': self.payload})
-                print(multipart_form_data)
-                pass
+                results = self.send_multipart_form_data(self.target.get('url'), multipart_form_data, multipart_file_names)
+                return results
             else:
                 print(self.target)
         else:
