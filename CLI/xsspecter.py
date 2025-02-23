@@ -72,7 +72,10 @@ def spray(
         for payload in payloads:
             payloadSprayObj = PayloadSpray(payload=payload, target=target)
             result = payloadSprayObj.run()
-            print(result)
+            if (result.status_code != 200):
+                console.print(f"[red]Payload [blue]{payload}[/blue] sent to [blue]{target['url']}[/blue] - Status {result.status_code}[/red]")
+            else:
+                console.print(f"[green]Payload [blue]{payload}[/blue] sent to [blue]{target['url']}[/blue] - Status {result.status_code}[/green]")
     
     # Export results
     ResultExporter.export_json(crawler.results, output)
