@@ -6,8 +6,8 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "migrate:dev": "prisma migrate dev",
-    "generate": "prisma generate"
+    "migrate:dev": "npx prisma migrate dev",
+    "generate": "npx prisma generate"
   },
   "dependencies": {
     "@prisma/client": "^6.4.1",
