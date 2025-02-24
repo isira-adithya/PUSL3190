@@ -1,7 +1,7 @@
 services:
-  app:
+  backend:
     build:
-      context: .
+      context: ./backend/
       target: development
     ports:
       - "3333:3000"
@@ -14,18 +14,19 @@ services:
     develop:
       watch:
         - action: sync
-          path: .
+          path: ./backend/
           ignore:
             - node_modules
             - package-lock.json
           target: /app/
         - action: rebuild
-          path: package.json
+          path: ./backend/package.json
         - action: sync+restart
-          path: ./.env
+          path: ./backend/.env
           target: /app/
     env_file:
-      - ./.env
+      - ./backend/.env
+
 
   db:
     image: postgres:latest
