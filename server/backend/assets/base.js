@@ -68,39 +68,7 @@ function collectBrowserAndWebsiteInfo() {
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       timezoneName: new Date().toLocaleDateString(undefined, {timeZoneName: 'long'}).split(',')[1],
       currentTime: new Date().toString(),
-      
-      // Feature detection
-      features: {
-        canvas: !!window.HTMLCanvasElement,
-        webGL: (() => {
-          try {
-            return !!window.WebGLRenderingContext && !!document.createElement('canvas').getContext('webgl');
-          } catch(e) {
-            return false;
-          }
-        })(),
-        audioAPI: typeof AudioContext !== 'undefined' || typeof webkitAudioContext !== 'undefined',
-        videoAPI: !!document.createElement('video').canPlayType,
-        clipboard: navigator.clipboard ? true : false,
-        pointerEvents: window.PointerEvent ? true : false,
-        touchEvents: 'ontouchstart' in window,
-        webVR: navigator.getVRDisplays ? true : false,
-        webXR: navigator.xr ? true : false
-      },
-      
-      // Browser plugins
-      plugins: Array.from(navigator.plugins || []).map(plugin => ({
-        name: plugin.name,
-        description: plugin.description,
-        filename: plugin.filename
-      })),
-      
-      // Supported MIME types
-      mimeTypes: Array.from(navigator.mimeTypes || []).map(mimeType => ({
-        type: mimeType.type,
-        description: mimeType.description,
-        suffixes: mimeType.suffixes
-      }))
+    
     };
   
     // Get permissions status if available
