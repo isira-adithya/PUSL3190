@@ -12,9 +12,16 @@
   "dependencies": {
     "@prisma/client": "^6.4.1",
     "express": "^4.21.2",
-    "nodemon": "^3.1.9"
+    "nodemon": "^3.1.9",
+    "terser": "^5.39.0"
   },
-  "keywords": ["xss", "blind-xss", "cybersecurity", "ethical-hacking", "hacking"],
+  "keywords": [
+    "xss",
+    "blind-xss",
+    "cybersecurity",
+    "ethical-hacking",
+    "hacking"
+  ],
   "author": "isira_adithya",
   "license": "ISC",
   "description": "XSSpecter - Server"
