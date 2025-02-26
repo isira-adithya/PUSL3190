@@ -1,9 +1,3 @@
-/**
- * Browser and Website Information Collector
- * This script collects comprehensive information about the user's browser
- * and the website they're visiting.
- */
-
 function collectBrowserAndWebsiteInfo() {
     const info = {
       // Browser core information
@@ -70,39 +64,10 @@ function collectBrowserAndWebsiteInfo() {
       locationHash: window.location.hash,
       locationOrigin: window.location.origin,
       
-      // Browser features detection
-      localStorage: typeof localStorage !== 'undefined',
-      sessionStorage: typeof sessionStorage !== 'undefined',
-      indexedDB: typeof indexedDB !== 'undefined',
-      webSockets: typeof WebSocket !== 'undefined',
-      webWorkers: typeof Worker !== 'undefined',
-      geolocation: navigator.geolocation ? true : false,
-      notifications: typeof Notification !== 'undefined',
-      serviceWorker: navigator.serviceWorker ? true : false,
-      webRTC: typeof RTCPeerConnection !== 'undefined',
-      
       // Time information
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       timezoneName: new Date().toLocaleDateString(undefined, {timeZoneName: 'long'}).split(',')[1],
       currentTime: new Date().toString(),
-      
-      // Network information
-      connection: navigator.connection ? {
-        downlink: navigator.connection.downlink,
-        effectiveType: navigator.connection.effectiveType,
-        rtt: navigator.connection.rtt,
-        saveData: navigator.connection.saveData
-      } : 'Not available',
-      
-      // Performance information
-      performance: window.performance ? {
-        navigationStart: window.performance.timing ? window.performance.timing.navigationStart : 'Not available',
-        loadEventEnd: window.performance.timing ? window.performance.timing.loadEventEnd : 'Not available',
-        loadTime: window.performance.timing ? (window.performance.timing.loadEventEnd - window.performance.timing.navigationStart) : 'Not available',
-      } : 'Not available',
-      
-      // Battery information
-      battery: 'Not requested', // Will be updated if available
       
       // Feature detection
       features: {
@@ -137,19 +102,6 @@ function collectBrowserAndWebsiteInfo() {
         suffixes: mimeType.suffixes
       }))
     };
-  
-    // Try to get battery info if available
-    if (navigator.getBattery) {
-      navigator.getBattery().then(battery => {
-        info.battery = {
-          charging: battery.charging,
-          chargingTime: battery.chargingTime,
-          dischargingTime: battery.dischargingTime,
-          level: battery.level
-        };
-        console.log('Updated battery information:', info.battery);
-      });
-    }
   
     // Get permissions status if available
     if (navigator.permissions) {
