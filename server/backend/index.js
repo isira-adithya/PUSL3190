@@ -1,6 +1,6 @@
 import express from "express";
-import fs from "fs";
 import { PrismaClient } from "@prisma/client";
+import { preparePayload } from "./helpers/prepare-payload.js";
 
 // Create Prisma client instance
 const prisma = new PrismaClient();
@@ -34,10 +34,7 @@ server.post("/", async (req, res) => {
 
 // Serve the XSS payload
 server.all("/*", async (req, res) => {
-
-    // Prepare the response
-    let result = fs.readFileSync("assets/base.js", "utf-8");
-    result = result.replace("{{DOMAIN}}", req.headers['host'] ?? 'example.com');
+    const result = await preparePayload(req.headers.host ?? 'localhost')
 
     // Set CORS headers
     res.setHeader('Access-Control-Allow-Origin', '*');
