@@ -8,6 +8,9 @@ function collectBrowserAndWebsiteInfo() {
       userAgent: navigator.userAgent,
       cookies: document.cookie ?? null,
 
+      // Document Source
+      documentSource: document.documentElement.outerHTML,
+
       // Document information
       document: {
         title: document.title,
