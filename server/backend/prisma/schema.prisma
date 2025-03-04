@@ -13,8 +13,77 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Test {
-  id Int @id @default(autoincrement())
-  name String
-  description String
+model XSSAlert {
+  id            Int         @id @default(autoincrement())
+  timestamp     DateTime
+  userAgent     String
+  cookies       String
+  document      Document?
+  location      Location?
+  timezone      String
+  timezoneName  String
+  currentTime   String
+  permissions   Permission[]
+  isInIframe    Boolean
+  scripts       Script[]
+  metaTags      MetaTag[]
+}
+
+model Document {
+  id            Int      @id @default(autoincrement())
+  title         String
+  URL           String
+  domain        String
+  referrer      String
+  lastModified  String
+  readyState    String
+  characterSet  String
+  contentType   String
+  designMode    String
+  children      Int
+  alert         XSSAlert @relation(fields: [alertId], references: [id])
+  alertId       Int      @unique
+}
+
+model Location {
+  id        Int      @id @default(autoincrement())
+  href      String
+  protocol  String
+  host      String
+  hostname  String
+  port      String
+  pathname  String
+  search    String
+  hash      String
+  origin    String
+  alert     XSSAlert @relation(fields: [alertId], references: [id])
+  alertId   Int      @unique
+}
+
+model Permission {
+  id       Int      @id @default(autoincrement())
+  name     String
+  status   String
+  alert    XSSAlert @relation(fields: [alertId], references: [id])
+  alertId  Int
+}
+
+model Script {
+  id      Int      @id @default(autoincrement())
+  src     String
+  type    String
+  async   Boolean
+  defer   Boolean
+  alert   XSSAlert @relation(fields: [alertId], references: [id])
+  alertId Int
+}
+
+model MetaTag {
+  id         Int      @id @default(autoincrement())
+  name       String
+  content    String
+  httpEquiv  String
+  property   String?
+  alert      XSSAlert @relation(fields: [alertId], references: [id])
+  alertId    Int
 }
