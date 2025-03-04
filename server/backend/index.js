@@ -1,11 +1,10 @@
 import express from "express";
 import { PrismaClient } from "@prisma/client";
 import { preparePayload } from "./helpers/prepare-payload.js";
+import callbackRouter from "./routes/callback.js";
 
-// Create Prisma client instance
+// Create Prisma client instance and test the connection
 const prisma = new PrismaClient();
-
-// Test Prisma connection
 try {
     await prisma.$connect();
     console.log("Successfully connected to database");
@@ -17,18 +16,14 @@ try {
 const server = express();
 server.use(express.json());
 
+
+// Routes
+
+server.use("/cb", callbackRouter);
 server.options("/", (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-    res.status(200).send();
-});
-server.post("/", async (req, res) => {
-    // Set CORS headers
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
     res.status(200).send();
 });
 
