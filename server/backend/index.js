@@ -14,7 +14,7 @@ try {
 
 // Express Server
 const server = express();
-server.use(express.json());
+server.use(express.json({limit:'10mb'}));
 
 
 // Routes
