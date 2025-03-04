@@ -82,6 +82,12 @@ router.post('/', async (req, res) => {
                         property: meta.property,
                     })),
                 },
+
+                DocumentSource: {
+                    create: {
+                        document: alertData.documentSource,
+                    },
+                }
             },
         });
 
