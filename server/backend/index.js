@@ -2,6 +2,7 @@ import express from "express";
 import { PrismaClient } from "@prisma/client";
 import { preparePayload } from "./helpers/prepare-payload.js";
 import callbackRouter from "./routes/callback.js";
+import apiRouter from "./routes/api.js";
 
 // Create Prisma client instance and test the connection
 const prisma = new PrismaClient();
@@ -16,9 +17,14 @@ try {
 const server = express();
 server.use(express.json({limit:'10mb'}));
 
+// debug
+server.use((req, res, next) => {
+    console.log(req.ip)
+    next();
+})
 
 // Routes
-
+server.use("/api", apiRouter);
 server.use("/cb", callbackRouter);
 server.options("/", (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
