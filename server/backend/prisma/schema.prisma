@@ -14,7 +14,7 @@ datasource db {
 }
 
 model XSSAlert {
-  id             Int              @id @default(autoincrement())
+  id             Int             @id @default(autoincrement())
   timestamp      DateTime
   userAgent      String
   cookies        String
@@ -27,7 +27,8 @@ model XSSAlert {
   isInIframe     Boolean
   scripts        Script[]
   metaTags       MetaTag[]
-  DocumentSource DocumentSource[]
+  DocumentSource DocumentSource?
+  Report         Report?
 }
 
 model Document {
@@ -93,5 +94,36 @@ model DocumentSource {
   id       Int      @id @default(autoincrement())
   document String
   alert    XSSAlert @relation(fields: [alertId], references: [id])
-  alertId  Int
+  alertId  Int      @unique
+}
+
+model Report {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  alert       XSSAlert @relation(fields: [alertId], references: [id])
+  alertId     Int      @unique
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
+}
+
+enum Role {
+  ADMIN
+  USER
+  VIEWER
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  username  String    @unique
+  email     String    @unique
+  password  String
+  apiToken  String    @unique
+  role      Role      @default(USER)
+  firstName String?
+  lastName  String?
+  isActive  Boolean   @default(true)
+  lastLogin DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
