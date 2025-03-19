@@ -74,6 +74,12 @@ router.get('/:id', async (req, res) => {
                 DocumentSource: true
             }
         });
+        const containsScreenshot = await prisma.screenshot.count({
+            where: {
+                xssAlertId: parseInt(id)
+            }
+        });
+        alert.containsScreenshot = containsScreenshot > 0;
 
         if (alert != null){
             res.status(200).json(alert);

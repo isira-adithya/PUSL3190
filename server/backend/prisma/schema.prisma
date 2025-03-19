@@ -29,8 +29,7 @@ model XSSAlert {
   metaTags       MetaTag[]
   DocumentSource DocumentSource?
   Report         Report?
-  Screenshot     Screenshot?     @relation(fields: [screenshotId], references: [id])
-  screenshotId   Int?
+  Screenshot     Screenshot?
 }
 
 model Document {
@@ -110,10 +109,11 @@ model Report {
 }
 
 model Screenshot {
-  id       Int        @id @default(autoincrement())
-  name     String
-  data     Bytes      @db.ByteA
-  XSSAlert XSSAlert[]
+  id         Int       @id @default(autoincrement())
+  name       String
+  data       Bytes     @db.ByteA
+  XSSAlert   XSSAlert? @relation(fields: [xssAlertId], references: [id])
+  xssAlertId Int?      @unique
 }
 
 enum Role {
