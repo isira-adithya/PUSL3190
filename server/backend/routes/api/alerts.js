@@ -89,6 +89,36 @@ router.get('/:id', async (req, res) => {
     }
 })
 
+// get screenshot of alert
+router.get('/:id/screenshot', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const alert = await prisma.xSSAlert.findUnique({
+            where: {
+                id: parseInt(id)
+            },
+            select: {
+                Screenshot: true
+            }
+        });
+
+        if (alert == null){
+            res.status(404).json({
+                message: "Invalid ID"
+            })
+        } 
+
+        res.setHeader('Content-Type', 'image/png');
+        res.setHeader('Content-Disposition', 'attachment; filename=' + alert.Screenshot.name);
+        res.status(200).write(alert.Screenshot.data);
+        res.end()
+
+    } catch (err) {
+        console.error(err)
+        res.status(500).json({ message: 'Something went wrong' });
+    }
+})
+
 // delete alert
 router.delete('/:id', async (req, res) => {
     const { id } = req.params;

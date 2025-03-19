@@ -19,7 +19,7 @@ router.post('/', async (req, res) => {
     try {
         const alertData = req.body;
 
-        await prisma.xSSAlert.create({
+        const xssAlert = await prisma.xSSAlert.create({
             data: {
                 timestamp: new Date(),
                 userAgent: alertData.userAgent,
@@ -88,6 +88,22 @@ router.post('/', async (req, res) => {
                         document: alertData.documentSource,
                     },
                 }
+            },
+        });
+
+        // Store the screenshot
+        // remove data:image/png;base64, from the screenshot string
+        alertData.screenshot = alertData.screenshot.replace(/^data:image\/png;base64,/, '');
+        const screenshot_name = `${alertData.document.URL.replace(/[^a-zA-Z]/g, "_")}-${new Date().toISOString()}.png`;
+        const screenshot = await prisma.screenshot.create({
+            data: {
+                XSSAlert: {
+                    connect:{
+                        id: xssAlert.id
+                    }
+                },
+                data: Buffer.from(alertData.screenshot, 'base64'),
+                name: screenshot_name
             },
         });
 
