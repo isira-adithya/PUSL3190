@@ -27,6 +27,10 @@ router.use(
       })
 );
 
+// middlewares
+import checkAuth from "../middlewares/auth.js";
+router.use(checkAuth);
+
 // routes
 import alertsRouter from "./api-routes/alerts.js";
 import usersRouter from "./api-routes/users.js";
