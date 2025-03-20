@@ -1,3 +1,4 @@
+.notes.md
 *.pyc
 tests/logs/*.log
 tests/logs/*.json
