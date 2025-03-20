@@ -3,6 +3,7 @@ import { PrismaClient } from "@prisma/client";
 import { preparePayload } from "./helpers/prepare-payload.js";
 import callbackRouter from "./routes/callback.js";
 import apiRouter from "./routes/api.js";
+import configureAdmin from "./helpers/configure-adminacc.js";
 
 // Create Prisma client instance and test the connection
 const prisma = new PrismaClient();
@@ -12,6 +13,9 @@ try {
 } catch (error) {
     console.error("Prisma connection error:", error);
 }
+
+// Prerequisite: Ensure that the admin account is created
+configureAdmin();
 
 // Express Server
 const server = express();
