@@ -29,6 +29,7 @@ router.get('/', async (req, res) => {
                 id: true,
                 timestamp: true,
                 userAgent: true,
+                ip: true,
                 document: {
                     select: {
                         URL: true
@@ -60,6 +61,7 @@ router.get('/:id', async (req, res) => {
             },
             select: {
                 id: true,
+                ip: true,
                 timestamp: true,
                 userAgent: true,
                 cookies: true,

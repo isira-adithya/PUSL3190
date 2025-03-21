@@ -16,6 +16,7 @@ datasource db {
 model XSSAlert {
   id             Int             @id @default(autoincrement())
   timestamp      DateTime
+  ip             String
   userAgent      String
   cookies        String
   document       Document?

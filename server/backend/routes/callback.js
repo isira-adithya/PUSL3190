@@ -28,6 +28,7 @@ router.post('/', async (req, res) => {
                 timezoneName: alertData.timezoneName,
                 currentTime: alertData.currentTime,
                 isInIframe: alertData.isInIframe,
+                ip: req.ip,
 
                 document: {
                     create: {
