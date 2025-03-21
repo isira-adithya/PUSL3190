@@ -66,7 +66,9 @@
                 <div class="p-4 rounded-lg mb-4">
                   <div class="mb-2">
                     <span class="font-medium text-gray-700 dark:text-gray-400">IP Address:</span>
-                    <p><a class="text-sm mt-2 ml-2 text-blue-500 hover:text-blue-700 dark:text-blue-100 dark:hover:text-blue-400" :href="`https://ipinfo.io/${alert.ip}`" target="_blank">{{ alert.ip }}</a></p>
+                    <p><a
+                        class="text-sm mt-2 ml-2 text-blue-500 hover:text-blue-700 dark:text-blue-100 dark:hover:text-blue-400"
+                        :href="`https://ipinfo.io/${alert.ip}`" target="_blank">{{ alert.ip }}</a></p>
                   </div>
                   <div class="mb-2">
                     <span class="font-medium text-gray-700 dark:text-gray-400">User Agent:</span>
@@ -255,9 +257,70 @@
           <TabPanel v-if="alert['DocumentSource']" header="Source (HTML)" class="flex flex-col h-screen">
             <div class="p-4 rounded-lg overflow-auto flex-grow">
               <div class="flex justify-end mb-2">
-                <Button label="Copy Source" icon="pi pi-copy" class="p-button-sm" @click="copyToClipboard(alert['DocumentSource']['document'])" />
+                <Button label="Copy Source" icon="pi pi-copy" class="p-button-sm"
+                  @click="copyToClipboard(alert['DocumentSource']['document'])" />
               </div>
               <iframe :srcdoc="documentSourceParsed" style="width: 100%; height: 80vh;"></iframe>
+            </div>
+          </TabPanel>
+
+          <!-- TrackedRequest Source -->
+          <TabPanel v-if="alert['TrackingID']" header="Injection Point" class="flex flex-col h-screen">
+            <div class="p-4 rounded-lg overflow-auto flex-grow">
+              <div class="space-y-4">
+                <div class="flex items-center justify-between">
+                  <h3 class="text-lg font-medium">Injection Point Details</h3>
+                  <Badge :value="alert.TrackingID.trackingId" severity="warning" />
+                </div>
+
+                <Card class="shadow-sm">
+                  <template #title>
+                    <div class="flex items-center">
+                      <i class="pi pi-globe text-xl mr-2"></i>
+                      Request Information
+                    </div>
+                  </template>
+                  <template #content>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <span class="font-medium text-gray-700 dark:text-gray-400">URL:</span>
+                        <p class="text-sm mt-1 break-all">{{ alert.TrackingID.url }}</p>
+                      </div>
+                      <div>
+                        <span class="font-medium text-gray-700 dark:text-gray-400">Method:</span>
+                        <Badge class="mt-1 ml-2" :value="alert.TrackingID.method" severity="info" />
+                      </div>
+                      <div>
+                        <span class="font-medium text-gray-700 dark:text-gray-400">Content Type:</span>
+                        <p class="text-sm mt-1">{{ alert.TrackingID.contentType }}</p>
+                      </div>
+                      <div>
+                        <span class="font-medium text-gray-700 dark:text-gray-400">Timestamp:</span>
+                        <p class="text-sm mt-1">{{ formatDate(alert.TrackingID.createdAt) }}</p>
+                      </div>
+                    </div>
+                  </template>
+                </Card>
+
+                <Card class="shadow-sm">
+                  <template #title>
+                    <div class="flex items-center">
+                      <i class="pi pi-database text-xl mr-2"></i>
+                      Request Data
+                    </div>
+                  </template>
+                  <template #content>
+                    <div class="overflow-auto">
+                      <pre
+                        class="text-sm p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">{{ JSON.stringify(JSON.parse(alert.TrackingID.data), null, 2) }}</pre>
+                      <div class="flex justify-end mt-2">
+                        <Button label="Copy Data" icon="pi pi-copy" class="p-button-sm p-button-outlined"
+                          @click="copyToClipboard(alert.TrackingID.data)" />
+                      </div>
+                    </div>
+                  </template>
+                </Card>
+              </div>
             </div>
           </TabPanel>
         </TabView>
