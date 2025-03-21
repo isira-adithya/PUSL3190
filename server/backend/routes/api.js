@@ -34,9 +34,11 @@ router.use(checkAuth);
 // routes
 import alertsRouter from "./api-routes/alerts.js";
 import usersRouter from "./api-routes/users.js";
+import statsRouter from "./api-routes/stats.js";
 
 // mount routes
 router.use("/alerts", alertsRouter);
 router.use("/users", usersRouter);
+router.use("/stats", statsRouter);
 
 export default router;
