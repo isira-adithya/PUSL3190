@@ -16,7 +16,7 @@ const router = createRouter({
                 {
                     path: '/account',
                     name: 'formlayout',
-                    component: () => import('@/views/Dashboard.vue')
+                    component: () => import('@/views/Account.vue')
                 },
                 {
                     path: '/settings',
