@@ -31,6 +31,8 @@ model XSSAlert {
   DocumentSource DocumentSource?
   Report         Report?
   Screenshot     Screenshot?
+  TrackingID     TrackingID?     @relation(fields: [trackingIDId], references: [id])
+  trackingIDId   Int?
 }
 
 model Document {
@@ -142,14 +144,27 @@ model Session {
   id        String   @id
   sid       String   @unique
   data      String
-  expiresAt   DateTime
+  expiresAt DateTime
 }
 
 // Settings
 model Settings {
-  id            Int      @id @default(autoincrement())
-  key           String   @unique
-  value         Json
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id        Int      @id @default(autoincrement())
+  key       String   @unique
+  value     Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// TrackingIDs
+model TrackingID {
+  id          Int        @id @default(autoincrement())
+  trackingId  String
+  url         String
+  method      String
+  contentType String
+  data        Json
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  XSSAlert    XSSAlert[]
 }

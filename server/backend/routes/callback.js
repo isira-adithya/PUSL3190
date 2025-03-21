@@ -8,7 +8,7 @@ router.options('/', (req, res) => {
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     res.status(200).send();
-}); 
+});
 
 router.post('/', async (req, res) => {
     // Set CORS headers
@@ -17,8 +17,8 @@ router.post('/', async (req, res) => {
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
     try {
+        var trackingId = null;
         const alertData = req.body;
-
         const xssAlert = await prisma.xSSAlert.create({
             data: {
                 timestamp: new Date(),
@@ -99,7 +99,7 @@ router.post('/', async (req, res) => {
         const screenshot = await prisma.screenshot.create({
             data: {
                 XSSAlert: {
-                    connect:{
+                    connect: {
                         id: xssAlert.id
                     }
                 },
@@ -107,6 +107,31 @@ router.post('/', async (req, res) => {
                 name: screenshot_name
             },
         });
+
+        if (alertData.uniqueIdentifier !== "null") {
+            // Check if the uniqueIdentifier is present in TrackingID model
+            trackingId = await prisma.trackingID.findFirst({
+                where: {
+                    trackingId: alertData.uniqueIdentifier,
+                },
+            });
+        }
+
+        if (trackingId) {
+            // Update the trackingId with the xSSAlert ID
+            await prisma.xSSAlert.update({
+                where: {
+                    id: xssAlert.id,
+                },
+                data: {
+                    TrackingID: {
+                        connect: {
+                            id: trackingId.id,
+                        },
+                    },
+                },
+            })
+        }
 
         console.log(`Successfully stored data from ${alertData.document.URL} - ${alertData.userAgent}`)
         res.status(200).send();
