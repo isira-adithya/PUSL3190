@@ -1,0 +1,336 @@
+<template>
+  <div class="grid grid-cols-12 gap-8">
+    <div class="col-span-12">
+      <div v-if="loading" class="flex justify-center items-center h-64">
+        <i class="pi pi-spin pi-spinner text-4xl"></i>
+        <span class="ml-2">Loading alert details...</span>
+      </div>
+
+      <div v-else-if="error" class="flex justify-center items-center h-64 text-red-500">
+        <i class="pi pi-exclamation-triangle text-4xl"></i>
+        <span class="ml-2">{{ error }}</span>
+      </div>
+
+      <div v-else>
+        <!-- Header with basic info -->
+        <div class="flex justify-between items-center mb-6">
+          <div>
+            <h1 class="text-2xl font-bold mb-2">Alert #{{ alert.id }}</h1>
+            <div class="text-gray-500">{{ formatDate(alert.timestamp) }}</div>
+          </div>
+          <div>
+            <Button label="Back to List" icon="pi pi-arrow-left" @click="goBack" />
+          </div>
+        </div>
+
+        <!-- Quick summary cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6" v-if="alert.document">
+          <Card class="shadow-sm">
+            <template #title>Domain</template>
+            <template #content>
+              <div class="flex items-center">
+                <i class="pi pi-globe text-xl mr-2"></i>
+                <span class="font-medium">{{ alert.document.domain }}</span>
+              </div>
+            </template>
+          </Card>
+
+          <Card class="shadow-sm">
+            <template #title>URL</template>
+            <template #content>
+              <div class="truncate">
+                <i class="pi pi-link text-xl mr-2"></i>
+                <span class="font-medium">{{ alert.document.URL }}</span>
+              </div>
+            </template>
+          </Card>
+
+          <Card class="shadow-sm" v-if="alert.timezone">
+            <template #title>Timezone</template>
+            <template #content>
+              <div class="flex items-center">
+                <i class="pi pi-clock text-xl mr-2"></i>
+                <span class="font-medium">{{ alert.timezone }}</span>
+              </div>
+            </template>
+          </Card>
+        </div>
+
+        <!-- Tabbed interface for all the details -->
+        <TabView>
+          <!-- Overview Tab -->
+          <TabPanel header="Overview">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h3 class="text-lg font-medium mb-3">Browser Details</h3>
+                <div class="p-4 rounded-lg mb-4">
+                  <div class="mb-2">
+                    <span class="font-medium text-gray-700 dark:text-gray-400">User Agent:</span>
+                    <div class="text-sm mt-1 p-2 rounded break-all ">{{ alert.userAgent }}</div>
+                  </div>
+                  <div>
+                    <span class="font-medium text-gray-700 dark:text-gray-400">In Iframe:</span>
+                    <br>
+                    <Badge class="mt-1 ml-2" :value="alert.isInIframe ? 'Yes' : 'No'"
+                      :severity="alert.isInIframe ? 'warning' : 'info'" />
+                  </div>
+                </div>
+
+                <h3 class="text-lg font-medium mb-3">Time Information</h3>
+                <div class="p-4 rounded-lg">
+                  <div class="mb-2">
+                    <span class="font-medium text-gray-700 dark:text-gray-400">Current Time:</span>
+                    <div class="text-sm mt-1">{{ alert.currentTime }}</div>
+                  </div>
+                  <div class="mb-2">
+                    <span class="font-medium text-gray-700 dark:text-gray-400">Timezone:</span>
+                    <div class="text-sm mt-1">{{ alert.timezone }} ({{ alert.timezoneName }})</div>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h3 class="text-lg font-medium mb-3">Document Information</h3>
+                <div class="p-4 rounded-lg">
+                  <div class="grid grid-cols-2 gap-x-4 gap-y-2" v-if="alert.document">
+                    <div><span class="font-medium text-gray-700 dark:text-gray-400">Title:</span> {{
+                      alert.document.title }}
+                    </div>
+                    <div><span class="font-medium text-gray-700 dark:text-gray-400">Ready State:</span> {{
+                      alert.document.readyState }}</div>
+                    <div><span class="font-medium text-gray-700 dark:text-gray-400">Character Set:</span> {{
+                      alert.document.characterSet }}</div>
+                    <div><span class="font-medium text-gray-700 dark:text-gray-400">Content Type:</span> {{
+                      alert.document.contentType }}</div>
+                    <div><span class="font-medium text-gray-700 dark:text-gray-400">Design Mode:</span> {{
+                      alert.document.designMode }}</div>
+                    <div><span class="font-medium text-gray-700 dark:text-gray-400">Children:</span> {{
+                      alert.document.children
+                    }}</div>
+                    <div><span class="font-medium text-gray-700 dark:text-gray-400">Last Modified:</span> {{
+                      alert.document.lastModified }}</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Screenshot -->
+              <div v-if="alert.containsScreenshot" class="col-span-2">
+                <h3 class="text-lg font-medium mb-3">Screenshot</h3>
+                <div class="p-4 rounded-lg">
+                  <img :src="`/api/alerts/${alert.id}/screenshot`" alt="Screenshot" class="mb-4" />
+                </div>
+              </div>
+            </div>
+          </TabPanel>
+
+          <!-- Location Tab -->
+          <TabPanel header="Location" v-if="alert.location">
+            <div class="mb-4">
+              <div class="flex items-center mb-2">
+                <i class="pi pi-link text-lg mr-2"></i>
+                <h3 class="text-lg font-medium">URL Breakdown</h3>
+              </div>
+              <div class="p-4 rounded-lg">
+                <div class="mb-2">
+                  <span class="font-medium text-gray-700 dark:text-gray-400">Full URL:</span>
+                  <div class="text-sm mt-1 p-2 rounded break-all">{{ alert.location.href }}</div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                  <div>
+                    <span class="font-medium text-gray-700 dark:text-gray-400">Protocol:</span>
+                    <br>
+                    <Badge :value="alert.location.protocol" severity="info" class="mt-1" />
+                  </div>
+                  <div>
+                    <span class="font-medium text-gray-700 dark:text-gray-400">Origin:</span>
+                    <div class="text-sm mt-1">{{ alert.location.origin }}</div>
+                  </div>
+                  <div>
+                    <span class="font-medium text-gray-700 dark:text-gray-400">Host:</span>
+                    <div class="text-sm mt-1">{{ alert.location.host }}</div>
+                  </div>
+                  <div>
+                    <span class="font-medium text-gray-700 dark:text-gray-400">Hostname:</span>
+                    <div class="text-sm mt-1">{{ alert.location.hostname }}</div>
+                  </div>
+                  <div>
+                    <span class="font-medium text-gray-700 dark:text-gray-400">Port:</span>
+                    <div class="text-sm mt-1">{{ alert.location.port || '(default)' }}</div>
+                  </div>
+                  <div>
+                    <span class="font-medium text-gray-700 dark:text-gray-400">Pathname:</span>
+                    <div class="text-sm mt-1">{{ alert.location.pathname }}</div>
+                  </div>
+                  <div>
+                    <span class="font-medium text-gray-700 dark:text-gray-400">Search:</span>
+                    <div class="text-sm mt-1 p-2 rounded" v-if="alert.location.search">{{ alert.location.search }}</div>
+                    <div class="text-sm mt-1 text-gray-300" v-else>(none)</div>
+                  </div>
+                  <div>
+                    <span class="font-medium text-gray-700 dark:text-gray-400">Hash:</span>
+                    <div class="text-sm mt-1 p-2 rounded" v-if="alert.location.hash">{{ alert.location.hash }}</div>
+                    <div class="text-sm mt-1 text-gray-300" v-else>(none)</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div v-if="alert.document.referrer">
+              <div class="flex items-center">
+                <i class="pi pi-arrow-right text-lg mr-2"></i>
+                <h3 class="text-lg font-medium">Referrer</h3>
+              </div>
+              <div class="pl-4 rounded-lg">
+                <div class="text-sm p-2 rounded break-all">{{ alert.document.referrer }}</div>
+              </div>
+            </div>
+          </TabPanel>
+
+          <!-- Scripts Tab -->
+          <TabPanel header="Scripts" :badge="alert.scripts.length">
+            <DataTable :value="alert.scripts" class="p-datatable-sm" showGridlines dataKey="id">
+              <Column field="id" header="ID" style="width: 5rem;"></Column>
+              <Column field="src" header="Source">
+                <template #body="{ data }">
+                  <div v-if="data.src" class="break-all">{{ data.src }}</div>
+                  <div v-else class="text-gray-500 italic">(inline script)</div>
+                </template>
+              </Column>
+              <Column field="type" header="Type">
+                <template #body="{ data }">
+                  <div v-if="data.type">{{ data.type }}</div>
+                  <div v-else class="text-gray-500 italic">(default)</div>
+                </template>
+              </Column>
+              <Column field="async" header="Async">
+                <template #body="{ data }">
+                  <i :class="data.async ? 'pi pi-check text-green-500' : 'pi pi-times text-red-500'"></i>
+                </template>
+              </Column>
+              <Column field="defer" header="Defer">
+                <template #body="{ data }">
+                  <i :class="data.defer ? 'pi pi-check text-green-500' : 'pi pi-times text-red-500'"></i>
+                </template>
+              </Column>
+            </DataTable>
+          </TabPanel>
+
+          <!-- Meta Tags Tab -->
+          <TabPanel v-if="alert.metaTags" header="Meta Tags" :badge="alert.metaTags.length">
+            <DataTable :value="alert.metaTags" class="p-datatable-sm" showGridlines dataKey="id">
+              <Column field="id" header="ID" style="width: 5rem;"></Column>
+              <Column field="name" header="Name">
+                <template #body="{ data }">
+                  <div v-if="data.name">{{ data.name }}</div>
+                  <div v-else class="text-gray-500 italic">(not set)</div>
+                </template>
+              </Column>
+              <Column field="httpEquiv" header="HTTP-Equiv">
+                <template #body="{ data }">
+                  <div v-if="data.httpEquiv">{{ data.httpEquiv }}</div>
+                  <div v-else class="text-gray-500 italic">(not set)</div>
+                </template>
+              </Column>
+              <Column field="property" header="Property">
+                <template #body="{ data }">
+                  <div v-if="data.property">{{ data.property }}</div>
+                  <div v-else class="text-gray-500 italic">(not set)</div>
+                </template>
+              </Column>
+              <Column field="content" header="Content">
+                <template #body="{ data }">
+                  <div v-if="data.content" class="break-all">{{ data.content }}</div>
+                  <div v-else class="text-gray-500 italic">(empty)</div>
+                </template>
+              </Column>
+            </DataTable>
+          </TabPanel>
+
+          <!-- Document Source -->
+          <TabPanel v-if="alert['DocumentSource']" header="Source (HTML)" class="flex flex-col h-screen">
+            <div class="p-4 rounded-lg overflow-auto flex-grow">
+              <div class="flex justify-end mb-2">
+                <Button label="Copy Source" icon="pi pi-copy" class="p-button-sm" @click="copyToClipboard(alert['DocumentSource']['document'])" />
+              </div>
+              <iframe :srcdoc="documentSourceParsed" style="width: 100%; height: 80vh;"></iframe>
+            </div>
+          </TabPanel>
+        </TabView>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref, onMounted } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { marked } from 'marked';
+
+const route = useRoute();
+const router = useRouter();
+const alert = ref(null);
+const loading = ref(true);
+const error = ref(null);
+const documentSourceParsed = ref(null);
+
+// Format date for display
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  return new Intl.DateTimeFormat('en-US', {
+    dateStyle: 'full',
+    timeStyle: 'long'
+  }).format(date);
+};
+
+// Navigate back to the alerts list
+const goBack = () => {
+  router.push('/alerts');
+};
+
+const copyToClipboard = (text) => {
+  navigator.clipboard.writeText(text);
+};
+
+// Fetch alert details
+const fetchAlertDetails = async () => {
+  loading.value = true;
+  error.value = null;
+
+  try {
+    const alertId = route.params.id;
+    const response = await fetch(`/api/alerts/${alertId}`);
+
+    if (!response.ok) {
+      // redirect to /app/
+      router.push("/")
+    }
+
+    alert.value = await response.json();
+    if (alert.value['DocumentSource']) {
+      documentSourceParsed.value = marked.parse(`\`\`\`html\n${alert.value['DocumentSource']['document']}\n\`\`\``);
+      const bgColor = '#282c34';
+      documentSourceParsed.value = `
+        <html>
+        <head>
+        <script src="/app/assets/js/highlightjs/highlight.min.js"><\/script>
+        <link rel="stylesheet" href="/app/assets/js/highlightjs/styles/atom-one-dark.css">
+        </head>
+        <body style='background-color: ${bgColor}; color: white; padding: 1rem;'>
+        ${documentSourceParsed.value}
+        <script>hljs.highlightAll();<\/script>
+        </body>
+        `
+    }
+  } catch (err) {
+    console.error('Error fetching alert details:', err);
+    error.value = err.message || 'Failed to load alert data';
+  } finally {
+    loading.value = false;
+  }
+};
+
+onMounted(() => {
+  fetchAlertDetails();
+});
+</script>
