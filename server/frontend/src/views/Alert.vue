@@ -65,6 +65,10 @@
                 <h3 class="text-lg font-medium mb-3">Browser Details</h3>
                 <div class="p-4 rounded-lg mb-4">
                   <div class="mb-2">
+                    <span class="font-medium text-gray-700 dark:text-gray-400">IP Address:</span>
+                    <p><a class="text-sm mt-2 ml-2 text-blue-500 hover:text-blue-700 dark:text-blue-100 dark:hover:text-blue-400" :href="`https://ipinfo.io/${alert.ip}`" target="_blank">{{ alert.ip }}</a></p>
+                  </div>
+                  <div class="mb-2">
                     <span class="font-medium text-gray-700 dark:text-gray-400">User Agent:</span>
                     <div class="text-sm mt-1 p-2 rounded break-all ">{{ alert.userAgent }}</div>
                   </div>

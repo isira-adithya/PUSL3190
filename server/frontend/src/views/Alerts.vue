@@ -27,6 +27,16 @@
                         <InputText v-model="filterModel.value" type="text" placeholder="Search by ID" />
                     </template>
                 </Column>
+                <Column field="document.URL" header="URL" style="min-width: 20rem">
+                    <template #body="{ data }">
+                        <div class="text-sm truncate max-w-lg" :title="data.document.URL">
+                            {{ data.document.URL }}
+                        </div>
+                    </template>
+                    <template #filter="{ filterModel }">
+                        <InputText v-model="filterModel.value" type="text" placeholder="Search by URL" />
+                    </template>
+                </Column>
                 <Column field="timestamp" header="Timestamp" style="min-width: 12rem">
                     <template #body="{ data }">
                         {{ formatDate(data.timestamp) }}
@@ -45,14 +55,14 @@
                         <InputText v-model="filterModel.value" type="text" placeholder="Search by user agent" />
                     </template>
                 </Column>
-                <Column field="document.URL" header="URL" style="min-width: 20rem">
+                <Column field="ip" header="IP Address" style="min-width: 20rem">
                     <template #body="{ data }">
-                        <div class="text-sm truncate max-w-lg" :title="data.document.URL">
-                            {{ data.document.URL }}
+                        <div class="text-sm truncate max-w-lg" :title="data.userAgent">
+                            {{ data.ip }}
                         </div>
                     </template>
                     <template #filter="{ filterModel }">
-                        <InputText v-model="filterModel.value" type="text" placeholder="Search by URL" />
+                        <InputText v-model="filterModel.value" type="text" placeholder="Search by user agent" />
                     </template>
                 </Column>
                 <Column field="document" header="Actions" style="min-width: 5rem">
