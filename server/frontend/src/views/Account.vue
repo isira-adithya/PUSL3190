@@ -48,7 +48,7 @@
             </div>
 
             <!-- Account Status (only editable for ADMIN) -->
-            <div class="field" v-if="accountDetails.role === 'ADMIN'">
+            <div class="field" v-if="accountDetails.role === 'ADMIN' && router.currentRoute.value.fullPath !== '/account'">
               <label for="isActive" class="block text-sm font-medium mb-2">Account Status</label>
               <div class="flex align-items-center">
                 <InputSwitch id="isActive" v-model="accountDetails.isActive" class="mr-2" />
