@@ -31,8 +31,15 @@ router.post(
             if (!isPasswordValid) {
                 return res.status(403).json({ message: "Invalid credentials" });
             }
+
+            // Check if user is active
+            if (!user.isActive) {
+                return res.status(403).json({ message: "User is disabled" });
+            }
+
             req.session.isLoggedIn = true;
             req.session.user = user;
+            req.session.user.lastUpdatedDB = new Date();
             
             // Remove password from user object
             delete req.session.user.password; 
@@ -59,6 +66,21 @@ router.get("/me", async (req, res) => {
     const user = req.session.user;
     if (!user) {
         return res.status(404).json({ message: "User not found" });
+    }
+    if (req.session.user.lastUpdatedDB) {
+        const lastUpdatedDB = new Date(req.session.user.lastUpdatedDB);
+        const currentTime = new Date();
+        const diffInMinutes = Math.floor((currentTime - lastUpdatedDB) / (1000 * 60));
+        if (diffInMinutes > 3) {
+            // Fetch user data from the database
+            const updatedUser = await prisma.user.findUnique({
+                where: {
+                    id: user.id,
+                },
+            });
+            req.session.user = updatedUser;
+            req.session.user.lastUpdatedDB = new Date();
+        }
     }
     res.status(200).json(user);
 });
