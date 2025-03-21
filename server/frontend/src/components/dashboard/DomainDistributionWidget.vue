@@ -1,13 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 
-const menu = ref(null);
-
-const items = ref([
-  { label: 'Export CSV', icon: 'pi pi-fw pi-download' },
-  { label: 'View Details', icon: 'pi pi-fw pi-search' }
-]);
-
 const domainDistribution = ref([
   { domain: 'example.com', count: 10 },
   { domain: 'test.com', count: 5 },
@@ -60,10 +53,6 @@ onMounted(() => {
   <div class="card">
     <div class="flex justify-between items-center mb-6">
       <div class="font-semibold text-xl">Domain Distribution</div>
-      <div>
-        <Button icon="pi pi-ellipsis-v" class="p-button-text p-button-plain p-button-rounded" @click="$refs.menu.toggle($event)"></Button>
-        <Menu ref="menu" popup :model="items" class="!min-w-40"></Menu>
-      </div>
     </div>
     <ul class="list-none p-0 m-0">
       <li v-for="(domain, index) in domainDistribution" :key="index" class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
