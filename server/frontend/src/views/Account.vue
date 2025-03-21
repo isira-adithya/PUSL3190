@@ -2,6 +2,7 @@
   <div class="grid grid-cols-12 gap-8">
     <div class="card col-span-12">
       <Toast />
+      <ConfirmDialog group="positioned"></ConfirmDialog>
       <div class="card-body p-6">
         <h2 class="text-2xl font-semibold mb-6">Account Details</h2>
 
@@ -75,7 +76,8 @@
               <!-- Current Password -->
               <div class="field">
                 <label for="currentPassword" class="block text-sm font-medium mb-2">Current Password</label>
-                <Password id="currentPassword" v-model="oldPassword" :feedback="false" toggleMask :class="{ 'p-invalid': errors.password }" @blur="validateField('password')" />
+                <Password id="currentPassword" v-model="oldPassword" :feedback="false" toggleMask
+                  :class="{ 'p-invalid': errors.password }" @blur="validateField('password')" />
                 <small v-if="errors.password" class="p-error">{{ errors.password }}</small>
               </div>
 
@@ -83,15 +85,16 @@
                 <!-- New Password -->
                 <div class="field">
                   <label for="newPassword" class="block text-sm font-medium mb-2">New Password</label>
-                  <Password id="newPassword" v-model="newPassword" :feedback="false" toggleMask :class="{ 'p-invalid': errors.password }" @blur="validateField('password')" />
+                  <Password id="newPassword" v-model="newPassword" :feedback="false" toggleMask
+                    :class="{ 'p-invalid': errors.password }" @blur="validateField('password')" />
                   <small v-if="errors.password" class="p-error">{{ errors.password }}</small>
                 </div>
 
                 <!-- Confirm New Password -->
                 <div class="field">
                   <label for="confirmNewPassword" class="block text-sm font-medium mb-2">Confirm New Password</label>
-                  <Password id="confirmNewPassword" v-model="confirmPassword" :feedback="false" toggleMask :class="{ 'p-invalid': errors.confirmPassword }"
-                    @blur="validateField('confirmPassword')" />
+                  <Password id="confirmNewPassword" v-model="confirmPassword" :feedback="false" toggleMask
+                    :class="{ 'p-invalid': errors.confirmPassword }" @blur="validateField('confirmPassword')" />
                   <small v-if="errors.confirmPassword" class="p-error">{{ errors.confirmPassword }}</small>
                 </div>
               </div>
@@ -106,7 +109,7 @@
 
         <Divider />
 
-        <div>
+        <div class="mb-12">
           <h2 class="text-2xl font-semibold mb-6">API Token</h2>
           <p class="text-sm text-gray-600">
             Your API token is used to authenticate requests to the API. Keep it secret!
@@ -128,10 +131,23 @@
 
         <Divider />
 
-        <div>
+        <div class="mb-12">
           <h2 class="text-2xl font-semibold mb-6">Account Activity</h2>
           <p class="text-sm text-gray-600">Last login: {{ accountDetails.lastLogin || 'N/A' }}</p>
           <p class="text-sm text-gray-600">Account created: {{ accountDetails.createdAt || 'N/A' }}</p>
+        </div>
+
+        <Divider />
+
+        <div>
+          <h2 class="text-2xl font-semibold mb-6">Danger Zone</h2>
+          <p class="text-sm text-gray-600">
+            If you want to delete your account, you can delete by clicking the below button. This action cannot be
+            undone.
+          </p>
+          <div class="mt-8 flex justify-start">
+            <Button type="button" label="Delete Account" class="p-button-danger" @click="deleteAccount" />
+          </div>
         </div>
       </div>
     </div>
@@ -141,6 +157,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useToast } from 'primevue/usetoast';
+import { useConfirm } from 'primevue';
 import { Divider } from 'primevue';
 
 // Components import
@@ -150,8 +167,10 @@ import Dropdown from 'primevue/dropdown';
 import InputSwitch from 'primevue/inputswitch';
 import Button from 'primevue/button';
 import Toast from 'primevue/toast';
+import router from '@/router';
 
 const toast = useToast();
+const confirm = useConfirm();
 const saving = ref(false);
 
 const oldPassword = ref('');
@@ -438,6 +457,70 @@ const changePassword = async () => {
     saving.value = false;
   }
 }
+
+const deleteAccount = async () => {
+  confirm.require({
+    group: 'positioned',
+    message: 'Are you sure you want to delete your account? This action cannot be undone.',
+    header: 'Confirmation',
+    icon: 'pi pi-exclamation-triangle',
+    position: 'top',
+    rejectProps: {
+      label: 'Cancel',
+      severity: 'secondary',
+      text: true
+    },
+    acceptProps: {
+      label: 'Delete',
+      text: true,
+      severity: 'danger'
+    },
+    accept: async () => {
+      try {
+        const response = await fetch('/api/users/me', {
+          method: 'DELETE'
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          if (response.status === 401) {
+            toast.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: errorData.message,
+              life: 3000
+            });
+            return;
+          }
+
+          throw new Error('Network response was not ok');
+        }
+
+        toast.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'Account deleted successfully',
+          life: 3000
+        });
+
+        window.setTimeout(() => {
+          router.push("/auth/login");
+        }, 3000);
+      } catch (error) {
+        console.error('Error deleting account:', error);
+        toast.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to delete account',
+          life: 3000
+        });
+      }
+    },
+    reject: () => {
+
+    }
+  });
+};
 
 onMounted(() => {
   retrieveAccountDetails();
