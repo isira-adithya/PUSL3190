@@ -37,6 +37,16 @@ router.post(
             // Remove password from user object
             delete req.session.user.password; 
 
+            // update lastLoggedIn 
+            await prisma.user.update({
+                where: {
+                    id: user.id,
+                },
+                data: {
+                    lastLogin: new Date(),
+                },
+            });
+
             res.status(200).json({ message: "Login successful" });
         } catch (err) {
             console.error(err);
