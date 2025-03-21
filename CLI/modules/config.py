@@ -6,6 +6,7 @@ class Config:
     def __init__(self):
         self.config_location = None
         self.domain = ''
+        self.api_key = ''
         self.max_depth = 2
         self.rate_limit = 5 # requests per second
         self.load(self.config_location)
@@ -22,6 +23,7 @@ class Config:
             with open(config_file, 'w') as f:
                 json.dump({
                     "domain": self.domain,
+                    "api_key": "",
                     "max_depth": self.max_depth,
                     "rate_limit": self.rate_limit
                 }, f, indent=4)
@@ -32,3 +34,4 @@ class Config:
             self.domain = _tobj['domain']
             self.max_depth = _tobj['max_depth']
             self.rate_limit = _tobj['rate_limit']
+            self.api_key = _tobj['api_key']

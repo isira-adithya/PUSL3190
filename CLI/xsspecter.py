@@ -30,7 +30,6 @@ def spray(
     """
     console = Console()
     payload_generator = PayloadGenerator()
-    payload_generator.generate_payloads()
     
     if not validators.url(url):
         console.print("[red]Invalid URL provided. Please enter a valid URL.[/red]")
@@ -67,8 +66,8 @@ def spray(
     console.print(f"[green]Identified {len(identified_forms)} forms. Sending payloads...[/green]")
     
     # spray payloads
-    payloads = payload_generator.get_payloads()
     for target in identified_forms:
+        payloads = payload_generator.get_payloads(target)
         for payload in payloads:
             payloadSprayObj = PayloadSpray(payload=payload, target=target)
             result = payloadSprayObj.run()
