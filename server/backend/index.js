@@ -3,7 +3,7 @@ import { PrismaClient } from "@prisma/client";
 import { preparePayload } from "./helpers/prepare-payload.js";
 import callbackRouter from "./routes/callback.js";
 import apiRouter from "./routes/api.js";
-import configureAdmin from "./helpers/configure-adminacc.js";
+import configureAdmin from "./helpers/startup.js";
 
 // Create Prisma client instance and test the connection
 const prisma = new PrismaClient();
