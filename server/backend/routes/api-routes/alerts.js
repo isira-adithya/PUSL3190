@@ -73,7 +73,8 @@ router.get('/:id', async (req, res) => {
                 isInIframe: true,
                 scripts: true,
                 metaTags: true,
-                DocumentSource: true
+                DocumentSource: true,
+                TrackingID: true
             }
         });
         const containsScreenshot = await prisma.screenshot.count({
