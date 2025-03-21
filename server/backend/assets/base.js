@@ -84,6 +84,10 @@ function collectBrowserAndWebsiteInfo() {
 }
 
 function sendInfoToServer(info){
+    const uid = "{{UID}}";
+    // Add unique identifier to the info object
+    info['uniqueIdentifier'] = uid;
+
     // To get the information as a JSON string
     const jsonString = JSON.stringify(info);
     fetch(`//${config.domain}/cb`, {

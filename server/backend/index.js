@@ -38,15 +38,15 @@ server.options("/", (req, res) => {
 });
 
 // Serve the XSS payload
-server.all("/*", async (req, res) => {
-    const result = await preparePayload(req.headers.host ?? 'localhost')
+server.get("/*", async (req, res) => {
+    const result = await preparePayload(req)
 
     // Set CORS headers
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
 
     // File Type
-    res.setHeader('Content-Type', 'text/javascript');
+    res.setHeader('Content-Type', 'application/javascript');
     res.status(200).send(result);
 })
 
