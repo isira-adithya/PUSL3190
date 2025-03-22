@@ -149,8 +149,7 @@ model Session {
 
 // Settings
 model Settings {
-  id        Int      @id @default(autoincrement())
-  key       String   @unique
+  key       String   @id @unique
   value     Json
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
