@@ -475,15 +475,33 @@ const testTelegramBot = async () => {
         life: 3000
     });
 
-    // Simulate API call for testing Telegram
-    setTimeout(() => {
+    const result = await fetch("/api/settings/test-telegram", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            telegram_bot_token: settings.telegram_bot_token,
+            telegram_chat_id: settings.telegram_chat_id
+        })
+    });
+
+    if (result.status == 200) {
         toast.add({
             severity: 'success',
             summary: 'Telegram Test',
             detail: 'Test message sent to Telegram successfully!',
             life: 3000
         });
-    }, 1500);
+    } else {
+        const errorData = await result.json();
+        toast.add({
+            severity: 'error',
+            summary: 'Telegram Test Failed',
+            detail: errorData.message || 'Could not send test message to Telegram',
+            life: 5000
+        });
+    }
 };
 
 // Confirm reset to defaults

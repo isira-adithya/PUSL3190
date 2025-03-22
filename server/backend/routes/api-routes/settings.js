@@ -199,4 +199,40 @@ router.post("/test-slack",
     }
 );
 
+// test telegram
+router.post("/test-telegram", body("telegram_bot_token").isString(), body("telegram_chat_id").isString(), async (req, res) => {
+    const { telegram_bot_token, telegram_chat_id } = req.body;
+
+    // Validate the request body
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
+    try {
+        const response = await fetch(`https://api.telegram.org/bot${telegram_bot_token}/sendMessage`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                chat_id: telegram_chat_id,
+                text: "Test message from the server.",
+            }),
+        });
+
+        if (!response.ok) {
+            if (response.status === 400) {
+                return res.status(400).json({ error: "Response Status: 400" });
+            }
+            throw new Error("Failed to send test message.");
+        }
+
+        return res.status(200).json({ message: "Test message sent successfully." });
+    } catch (error) {
+        console.error("Error testing Telegram bot:", error);
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
+});
+
 export default router;
