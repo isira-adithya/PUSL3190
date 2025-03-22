@@ -166,4 +166,37 @@ router.post("/test-discord",
     }
 );
 
+// test slack
+router.post("/test-slack", 
+    body("slack_webhook").isURL(),
+    async (req, res) => {
+        const { slack_webhook } = req.body;
+
+        // Validate the request body
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+
+        try {
+            const response = await fetch(slack_webhook, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ text: "Test message from the server." }),
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to send test message.");
+            }
+
+            return res.status(200).json({ message: "Test message sent successfully." });
+        } catch (error) {
+            console.error("Error testing Slack webhook:", error);
+            return res.status(500).json({ error: "Internal Server Error" });
+        }
+    }
+);
+
 export default router;

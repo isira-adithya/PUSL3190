@@ -428,15 +428,32 @@ const testSlackWebhook = async () => {
         life: 3000
     });
 
-    // Simulate API call for testing webhook
-    setTimeout(() => {
+    const result = await fetch("/api/settings/test-slack", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            slack_webhook: settings.slack_webhook
+        })
+    });
+
+    if (result.status == 200) {
         toast.add({
             severity: 'success',
             summary: 'Slack Test',
             detail: 'Test message sent to Slack successfully!',
             life: 3000
         });
-    }, 1500);
+    } else {
+        const errorData = await result.json();
+        toast.add({
+            severity: 'error',
+            summary: 'Slack Test Failed',
+            detail: errorData.message || 'Could not send test message to Slack',
+            life: 5000
+        });
+    }
 };
 
 // Test Telegram Bot
