@@ -36,11 +36,13 @@ import alertsRouter from "./api-routes/alerts.js";
 import usersRouter from "./api-routes/users.js";
 import statsRouter from "./api-routes/stats.js";
 import cliRouter from "./api-routes/cli.js";
+import settingsRouter from "./api-routes/settings.js";
 
 // mount routes
 router.use("/alerts", alertsRouter);
 router.use("/users", usersRouter);
 router.use("/stats", statsRouter);
 router.use("/cli", cliRouter);
+router.use("/settings", settingsRouter);
 
 export default router;
