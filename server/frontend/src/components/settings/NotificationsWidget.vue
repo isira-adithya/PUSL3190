@@ -1,6 +1,6 @@
 <template>
     <div class="card-body p-6">
-        <h2 class="text-2xl font-bold mb-4">Notification Settings</h2>
+        <h2 class="text-2xl font-bold mb-4">Settings</h2>
 
         <div v-if="loading" class="flex justify-center my-8">
             <ProgressSpinner style="width: 50px; height: 50px" />
