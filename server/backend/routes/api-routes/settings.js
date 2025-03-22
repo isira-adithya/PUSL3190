@@ -133,4 +133,37 @@ router.post(
         }
 });
 
+// test discord
+router.post("/test-discord",
+    body("discord_webhook").isURL(),
+    async (req, res) => {
+        // Validate the request body
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+
+        var { discord_webhook } = req.body;
+
+        try {
+            const response = await fetch(discord_webhook, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ content: "Test message from the server." }),
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to send test message.");
+            }
+
+            return res.status(200).json({ message: "Test message sent successfully." });
+        } catch (error) {
+            console.error("Error testing Discord webhook:", error);
+            return res.status(500).json({ error: "Internal Server Error" });
+        }
+    }
+);
+
 export default router;

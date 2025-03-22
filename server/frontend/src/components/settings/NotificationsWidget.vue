@@ -381,15 +381,32 @@ const testDiscordWebhook = async () => {
         life: 3000
     });
 
-    // Simulate API call for testing webhook
-    setTimeout(() => {
+    const result = await fetch("/api/settings/test-discord", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            discord_webhook: settings.discord_webhook
+        })
+    });
+
+    if (result.status == 200) {
         toast.add({
             severity: 'success',
             summary: 'Discord Test',
             detail: 'Test message sent to Discord successfully!',
             life: 3000
         });
-    }, 1500);
+    } else {
+        const errorData = await result.json();
+        toast.add({
+            severity: 'error',
+            summary: 'Discord Test Failed',
+            detail: errorData.message || 'Could not send test message to Discord',
+            life: 5000
+        });
+    }
 };
 
 // Test Slack Webhook
