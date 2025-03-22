@@ -5,7 +5,7 @@ import * as argon2 from "argon2";
 
 const SETTINGS = {
     // notifications
-    notifications_enabled: true,
+    notifications_enabled: false,
 
     // smtp
     smtp_host: "smtp.example.com",
@@ -15,6 +15,11 @@ const SETTINGS = {
     smtp_from: "",
 
     // discord,slack,telegram
+    discord_enabled: false,
+    slack_enabled: false,
+    telegram_enabled: false,
+
+    // webhooks
     discord_webhook: "",
     slack_webhook: "",
     telegram_bot_token: "",
