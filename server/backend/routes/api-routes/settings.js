@@ -68,7 +68,17 @@ router.put(
                     }
                 });
             }
-            return res.status(200).json(setting);
+            const updatedSettings = await prisma.settings.findMany();
+            const jsonObj = {};
+            for (const setting of updatedSettings) {
+                // mark the smtp pass
+                if (setting.key === 'smtp_pass') {
+                    setting.value = '********';
+                }
+                jsonObj[setting.key] = setting.value;
+            }
+            
+            return res.status(200).json(jsonObj);
         } catch (error) {
             console.error('Error updating settings:', error);
             return res.status(500).json({ error: 'Internal Server Error' });

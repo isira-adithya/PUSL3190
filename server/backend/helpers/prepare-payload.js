@@ -6,7 +6,6 @@ async function preparePayload(req){
     var uniqueIdentifier = null;
     if (req.path.match(/\/[a-zA-Z0-9]{10}/)) {
         uniqueIdentifier = req.path.split("/").pop();
-        console.log("Unique Identifier:", uniqueIdentifier);
     }
 
     // Prepare the response

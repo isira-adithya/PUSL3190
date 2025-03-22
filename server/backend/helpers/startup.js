@@ -12,7 +12,7 @@ const SETTINGS = {
     smtp_port: 587,
     smtp_user: "",
     smtp_pass: "",
-    smtp_from: "",
+    smtp_from: "xsspecter@example.com",
 
     // discord,slack,telegram
     discord_enabled: false,
@@ -20,8 +20,8 @@ const SETTINGS = {
     telegram_enabled: false,
 
     // webhooks
-    discord_webhook: "",
-    slack_webhook: "",
+    discord_webhook: "https://discord.com/api/webhooks/<ID>/<TOKEN>",
+    slack_webhook: "https://hooks.slack.com/services/**/**/**",
     telegram_bot_token: "",
     telegram_chat_id: "",
 
