@@ -330,16 +330,36 @@ const testSmtpConnection = async () => {
         life: 3000
     });
 
-    // Here you would typically make an API call to test the SMTP connection
-    // For this example, we're just showing how it would work in the UI
-    setTimeout(() => {
+    const result = await fetch(`/api/settings/test-smtp`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            smtp_host: settings.smtp_host,
+            smtp_port: settings.smtp_port,
+            smtp_user: settings.smtp_user,
+            smtp_pass: settings.smtp_pass,
+            smtp_from: settings.smtp_from
+        })
+    });
+
+    if (result.status == 200) {
         toast.add({
             severity: 'success',
             summary: 'SMTP Test',
             detail: 'SMTP connection successful!',
             life: 3000
         });
-    }, 1500);
+    } else {
+        const errorData = await result.json();
+        toast.add({
+            severity: 'error',
+            summary: 'SMTP Test Failed',
+            detail: errorData.message || 'Could not connect to SMTP server',
+            life: 5000
+        });
+    }
 };
 
 // Test Discord Webhook
