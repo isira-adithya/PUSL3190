@@ -205,7 +205,7 @@ router.post("/generate-token", async (req, res) => {
         return res.status(404).json({ message: "User not found" });
     }
     // Generate a token for the user
-    const token = await crypto.randomBytes(16).toString("hex");
+    const token = crypto.randomBytes(16).toString("hex");
     await prisma.user.update({
         where: {
             id: user.id,
@@ -214,6 +214,8 @@ router.post("/generate-token", async (req, res) => {
             apiToken: token,
         },
     });
+    // Update session user data
+    req.session.user.apiToken = token;
 
     res.status(200).json({ apiToken: token });
 });
