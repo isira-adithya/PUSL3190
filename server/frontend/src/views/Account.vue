@@ -48,12 +48,19 @@
             </div>
 
             <!-- Account Status (only editable for ADMIN) -->
-            <div class="field" v-if="accountDetails.role === 'ADMIN' && router.currentRoute.value.fullPath !== '/account'">
+            <div class="field"
+              v-if="accountDetails.role === 'ADMIN' && router.currentRoute.value.fullPath !== '/account'">
               <label for="isActive" class="block text-sm font-medium mb-2">Account Status</label>
               <div class="flex align-items-center">
                 <InputSwitch id="isActive" v-model="accountDetails.isActive" class="mr-2" />
                 <span>{{ accountDetails.isActive ? 'Active' : 'Inactive' }}</span>
               </div>
+            </div>
+
+            <!-- Email Notifications -->
+            <div class="field flex items-center justify-between">
+              <label for="notifications_enabled" class="font-medium">Email Notifications</label>
+              <InputSwitch id="notifications_enabled" v-model="accountDetails.isNotificationsEnabled" />
             </div>
           </div>
 

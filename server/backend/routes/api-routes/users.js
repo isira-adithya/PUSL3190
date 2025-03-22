@@ -95,6 +95,7 @@ router.put(
     body("firstName").isString().notEmpty().withMessage("First name is required"),
     body("lastName").isString().notEmpty().withMessage("Last name is required"),
     body("isActive").isBoolean().withMessage("isActive must be a boolean"),
+    body("isNotificationsEnabled").isBoolean().withMessage("isNotificationsEnabled must be a boolean"),
     body("role").isString().notEmpty().custom((role) => {
         const validRoles = ["ADMIN", "USER", "VIEWER"];
         if (!validRoles.includes(role)) {
@@ -103,7 +104,7 @@ router.put(
         return true;
     }).withMessage("Role is required"),
     async (req, res) => {
-        const { email, firstName, lastName, isActive, role } = req.body;
+        const { email, firstName, lastName, isActive, isNotificationsEnabled, role } = req.body;
         const currentUser = req.session.user;
 
         if (!currentUser) {
@@ -122,6 +123,7 @@ router.put(
                 email,
                 firstName,
                 lastName,
+                isNotificationsEnabled,
                 isActive: currentUser.role === "ADMIN" ? isActive : currentUser.isActive,
                 role: currentUser.role === "ADMIN" ? role : currentUser.role
             },
@@ -137,6 +139,7 @@ router.put(
             email,
             firstName,
             lastName,
+            isNotificationsEnabled,
             isActive: currentUser.role === "ADMIN" ? isActive : currentUser.isActive,
             role: currentUser.role === "ADMIN" ? role : currentUser.role
         };
