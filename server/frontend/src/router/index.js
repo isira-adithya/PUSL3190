@@ -21,7 +21,7 @@ const router = createRouter({
                 {
                     path: '/settings',
                     name: 'input',
-                    component: () => import('@/views/Dashboard.vue')
+                    component: () => import('@/views/Settings.vue')
                 },
                 {
                     path: '/logout',

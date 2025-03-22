@@ -10,7 +10,6 @@ const model = ref([
             { label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' },
             { label: 'Alerts', icon: 'pi pi-fw pi-bolt', to: '/alerts' },
             { label: 'Account', icon: 'pi pi-fw pi-user', to: '/account', class: 'rotated-icon' },
-            { label: 'Settings', icon: 'pi pi-fw pi-cog', to: '/settings' },
             { label: 'Logout', icon: 'pi pi-fw pi-sign-out', to: '/logout' }
         ]
     },
@@ -32,6 +31,13 @@ const model = ref([
         ]
     }
 ]);
+
+const user = JSON.parse(localStorage.getItem('user'));
+if (user) {
+    if (user.role === 'ADMIN'){
+        model.value[0].items.push({ label: 'Settings', icon: 'pi pi-fw pi-cog', to: '/settings' });
+    }
+}
 </script>
 
 <template>
