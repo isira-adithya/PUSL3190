@@ -9,7 +9,7 @@ from typing import Optional, Set, Dict
 from modules.html_parser import HTMLParser
 
 class WebCrawler:
-    def __init__(self, base_url: str, max_depth: int = 2, max_pages: int = 100, should_crawl: bool = False):
+    def __init__(self, base_url: str, max_depth: int = 2, max_pages: int = 100, should_crawl: bool = False, proxy: str = None, insecure: bool = False):
         self.base_url = base_url
         self.max_depth = max_depth
         self.max_pages = max_pages
@@ -21,6 +21,13 @@ class WebCrawler:
         self.identified_forms = []
         self.should_crawl = should_crawl
         self.http_session = requests.Session()
+        self.http_session.proxies.update({
+            'http': proxy,
+            'https': proxy
+        })
+        if insecure:
+            requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
+        self.http_session.verify = not insecure
         
     def is_valid_url(self, url: str) -> bool:
         """Check if URL is valid and belongs to the same domain."""

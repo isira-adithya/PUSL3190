@@ -23,7 +23,13 @@ def spray(
     ),
     crawl: bool = typer.Option(
         False, help="Crawl the website"
-    )
+    ),
+    proxy: str = typer.Option(
+        None, help="Proxy to use for requests (format: http://user:pass@host:port)."
+    ),
+    insecure: bool = typer.Option(
+        False, help="Ignore SSL certificate warnings."
+    ),
 ):
     """
     Spray payloads to the given URL and save the results to a JSON file.
@@ -45,7 +51,7 @@ def spray(
         console.print(f"Crawling: [red]Disabled[/red]")
     console.print(f"Output File: {output}")
     
-    crawler = WebCrawler(base_url=url, max_depth=depth, max_pages=max_pages, should_crawl=crawl)
+    crawler = WebCrawler(base_url=url, max_depth=depth, max_pages=max_pages, should_crawl=crawl, proxy=proxy, insecure=insecure)
     
     # Create a single progress instance for the entire crawling process
     progress = Progress(
