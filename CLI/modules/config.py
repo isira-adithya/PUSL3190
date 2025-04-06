@@ -4,6 +4,14 @@ import json
 
 class Config:
     def __init__(self):
+        # Default values
+        self.IGNORE_KEYS = ['csrf_token', 'session_id', 'cookie', 'token', 'authenticity_token', 'auth_token', 'authenticity']
+        self.DEFAULT_EMAIL = 'example@example.com'
+        self.DEFAULT_PHONE = '1234567890'
+        self.DEFAULT_URL = 'http://example.com'
+        self.DEFAULT_NUMBER = '1234567890'
+
+        # Customizable
         self.config_location = None
         self.domain = ''
         self.api_key = ''
