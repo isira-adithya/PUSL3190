@@ -62,11 +62,11 @@ class HTMLParser:
                     })
         return True
 
-    def process(self):
+    def extract_forms(self):
         # Process the html content
         forms = self.find_forms()
         for form in forms:
-            form_processor = FormProcessor(form)
+            form_processor = FormProcessor(form, self.url)
             form_processor.process()
             # every form's url in form_processor.form_data should be absolute
             form_processor.form_data['url'] = self.convert_to_absolute_url(form_processor.form_data['url'], self.url, self.url_schema)
