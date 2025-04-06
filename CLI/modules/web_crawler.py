@@ -20,6 +20,7 @@ class WebCrawler:
         self.tasks: Dict[str, TaskID] = {}
         self.identified_forms = []
         self.should_crawl = should_crawl
+        self.http_session = requests.Session()
         
     def is_valid_url(self, url: str) -> bool:
         """Check if URL is valid and belongs to the same domain."""
@@ -31,7 +32,7 @@ class WebCrawler:
     def get_links(self, url: str) -> set:
         """Extract all links from a webpage."""
         try:
-            response = requests.get(url, timeout=10)
+            response = self.http_session.get(url, timeout=10)
             response.raise_for_status()
             soup = BeautifulSoup(response.text, 'html.parser')
             links = set()
@@ -81,7 +82,7 @@ class WebCrawler:
                 )
                 self.tasks[url] = task_id
 
-            response = requests.get(url, timeout=10)
+            response = self.http_session.get(url, timeout=10)
             response.raise_for_status()
 
             # identify forms

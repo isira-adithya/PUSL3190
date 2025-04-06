@@ -4,9 +4,10 @@ import requests
 from requests_toolbelt import MultipartEncoder
 
 class PayloadSpray:
-    def __init__(self, payload, target):
+    def __init__(self, payload, target, http_session: requests.Session):
         self.payload = payload
         self.target = target
+        self.http_session = http_session
     
     def send_multipart_form_data(self, url, data, files=None):
         fields = {}
@@ -24,7 +25,7 @@ class PayloadSpray:
         encoder = MultipartEncoder(fields=fields)
         
         # Send the request
-        response = requests.post(
+        response = self.http_session.post(
             url,
             data=encoder,
             headers={
@@ -49,12 +50,12 @@ class PayloadSpray:
     def run(self):
         if (self.target.get('method').lower() == 'get'):
             query = self.generate_query(self.target.get('data'))
-            result = requests.get(f"{self.target.get('url')}?{query}", headers={'User-Agent': self.payload})
+            result = self.http_session.get(f"{self.target.get('url')}?{query}", headers={'User-Agent': self.payload})
             return result
         elif (self.target.get('method').lower() == 'post'):
             if self.target.get('content_type').lower() == 'application/x-www-form-urlencoded':
                 query = self.generate_query(self.target.get('data'))
-                result = requests.post(self.target.get('url'), data=query, headers={'User-Agent': self.payload, 'Content-Type': self.target.get('content_type')})
+                result = self.http_session.post(self.target.get('url'), data=query, headers={'User-Agent': self.payload, 'Content-Type': self.target.get('content_type')})
                 return result
             elif self.target.get('content_type').lower() == 'multipart/form-data':
                 multipart_form_data = {}

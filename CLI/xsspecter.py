@@ -69,7 +69,7 @@ def spray(
     for target in identified_forms:
         payloads = payload_generator.get_payloads(target)
         for payload in payloads:
-            payloadSprayObj = PayloadSpray(payload=payload, target=target)
+            payloadSprayObj = PayloadSpray(payload=payload, target=target, http_session=crawler.http_session)
             result = payloadSprayObj.run()
             if (result.status_code != 200):
                 console.print(f"[red]Payload [blue]{payload}[/blue] sent to [blue]{target['url']}[/blue] - Status {result.status_code}[/red]")
