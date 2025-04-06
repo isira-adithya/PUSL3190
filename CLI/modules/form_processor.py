@@ -1,10 +1,13 @@
 class FormProcessor:
-    def __init__(self, form):
+    def __init__(self, form, url):
         self.form = form
         self.form_data = {}
+        self.form_url = url
 
     def organize_forms(self, form):
         url = form['action']
+        if (url == ''):
+            url = self.form_url
         method = form['method']
         inputs = form.find_all('input')
         content_type = form.get('enctype', 'application/x-www-form-urlencoded')
