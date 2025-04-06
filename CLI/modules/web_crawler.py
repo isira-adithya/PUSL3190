@@ -86,7 +86,7 @@ class WebCrawler:
 
             # identify forms
             html_parser = HTMLParser(url, response.text)
-            identified_forms = html_parser.process()
+            identified_forms = html_parser.extract_forms()
             self.identified_forms.extend(identified_forms)
             
             # extract page information
