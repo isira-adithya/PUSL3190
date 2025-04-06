@@ -20,7 +20,10 @@ class PayloadGenerator:
             'uid': unique_id
         }
         try:
-            requests.post(f'http://{self.config.domain}/api/cli/track', json=payload, headers={'Content-Type': 'application/json', 'Authorization': f"Token {self.config.api_key}"})
+            response = requests.post(f'http://{self.config.domain}/api/cli/track', json=payload, headers={'Content-Type': 'application/json', 'Authorization': f"Token {self.config.api_key}"})
+            if response.status_code != 200:
+                print(f"Error sending payload to server: {response.status_code} - {response.text}")
+                exit()
         except requests.exceptions.RequestException as e:
             print(f"Error sending payload to server: {e}")
             exit()
