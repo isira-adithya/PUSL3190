@@ -1,4 +1,5 @@
 from modules.config import Config
+import urllib.parse
 import requests
 from requests_toolbelt import MultipartEncoder
 
@@ -39,22 +40,23 @@ class PayloadSpray:
     def generate_query(self, data):
         # for data.key generate data.key=data.value&data.key=data.value
         query = ''
+        urlEncodedPayload = urllib.parse.quote_plus(self.payload)
         for key in data:
             # query += f'{key}={data[key]}&'
-            query += f'{key}={self.payload}&'
+            query += f'{key}={urlEncodedPayload}&'
         return query[:-1]
 
     def run(self):
-        if (self.target.get('method') == 'GET'):
+        if (self.target.get('method').lower() == 'get'):
             query = self.generate_query(self.target.get('data'))
             result = requests.get(f"{self.target.get('url')}?{query}", headers={'User-Agent': self.payload})
             return result
-        elif (self.target.get('method') == 'POST'):
-            if self.target.get('content_type') == 'application/x-www-form-urlencoded':
+        elif (self.target.get('method').lower() == 'post'):
+            if self.target.get('content_type').lower() == 'application/x-www-form-urlencoded':
                 query = self.generate_query(self.target.get('data'))
                 result = requests.post(self.target.get('url'), data=query, headers={'User-Agent': self.payload, 'Content-Type': self.target.get('content_type')})
                 return result
-            elif self.target.get('content_type') == 'multipart/form-data':
+            elif self.target.get('content_type').lower() == 'multipart/form-data':
                 multipart_form_data = {}
                 multipart_file_names = {}
                 for key in self.target.get('data'):
@@ -65,6 +67,8 @@ class PayloadSpray:
                 results = self.send_multipart_form_data(self.target.get('url'), multipart_form_data, multipart_file_names)
                 return results
             else:
+                # TODO: Add a detailed error log here
                 print(self.target)
         else:
+            # TODO: Add a detailed error log here
             print(self.target)
