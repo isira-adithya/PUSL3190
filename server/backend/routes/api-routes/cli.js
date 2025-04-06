@@ -15,28 +15,24 @@ router.post(
         if (!value.url || typeof value.url !== 'string') {
             return false;
         }
-
-        if (!value.method || !['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'].includes(value.method)) {
-            return false;
-        }
-
+        
         if (!value.data || typeof value.data !== 'object') {
             return false;
         }
-
+        
         // Check if all data fields have value and type properties
         for (const field in value.data) {
             if (!value.data[field].hasOwnProperty('value') || !value.data[field].hasOwnProperty('type')) {
                 return false;
             }
         }
-
+        
         // content_type is optional, but if present should be a string
         if (value.content_type !== undefined && typeof value.content_type !== 'string') {
             return false;
         }
-
-        if (!value.method || !['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'].includes(value.method)) {
+        
+        if (!value.method || !['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'].includes(value.method.toUpperCase())) {
             return false;
         }
 
