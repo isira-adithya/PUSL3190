@@ -8,6 +8,7 @@ const SETTINGS = {
     notifications_enabled: false,
 
     // smtp
+    emails_enabled: false,
     smtp_host: "smtp.example.com",
     smtp_port: 587,
     smtp_user: "",

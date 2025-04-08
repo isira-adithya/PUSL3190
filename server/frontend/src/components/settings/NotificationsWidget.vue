@@ -24,6 +24,12 @@
                 <!-- SMTP Settings -->
                 <Panel header="Email Notifications (SMTP)" :toggleable="true" class="mb-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="field flex items-center justify-between col-span-2">
+                            <label for="emails_enabled" class="font-medium">Enable Emails</label>
+                            <InputSwitch id="emails_enabled" v-model="settings.emails_enabled"
+                                :disabled="!settings.notifications_enabled" />
+                        </div>
+
                         <div class="field">
                             <label for="smtp_host" class="block mb-2">SMTP Host</label>
                             <InputText id="smtp_host" v-model="settings.smtp_host" class="w-full"
@@ -197,6 +203,7 @@ const confirm = useConfirm();
 // Settings state
 const defaultSettings = {
     notifications_enabled: false,
+    emails_enabled: false,
     smtp_host: '',
     smtp_port: 587,
     smtp_user: '',

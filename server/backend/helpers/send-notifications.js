@@ -26,7 +26,6 @@ async function send(xssAlertId){
         }
     });
     
-    
     // Send to Discord if enabled
     if (discordEnabled) {
         const discordMessage = prepareDiscordMessage(xssAlert);
@@ -41,8 +40,6 @@ async function send(xssAlertId){
         }
     }
 
-    
-
     // Send to Slack if enabled
     if (slackEnabled) {
         const slackMessage = prepareSlackMessage(xssAlert);
@@ -56,7 +53,6 @@ async function send(xssAlertId){
             console.log(`Slack response: ${response.status} ${response.statusText} - ${await response.text()}`);
         }
     }
-
 
     // Send to telegram if enabled
     if (telegramEnabled) {
