@@ -371,7 +371,7 @@ function prepareEmailHTML(xssAlert) {
       }
       .action-button {
         display: inline-block;
-        background-color: #5865F2;
+        background-color: white;
         color: white;
         padding: 10px 20px;
         text-decoration: none;
