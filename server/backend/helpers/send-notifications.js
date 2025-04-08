@@ -1,41 +1,6 @@
 import {PrismaClient} from "@prisma/client";
 const prisma = new PrismaClient();
-
-function prepareDiscordMessage(xssAlert) {
-    const message = `XSS Alert: ${xssAlert.id}
-> **Vulnerable URL**: \`${xssAlert.location.href}\`
-> **User Agent**: \`${xssAlert.userAgent}\`
-> **Cookies**: \`${xssAlert.cookies}\`
-> **Origin**: \`${xssAlert.location.origin}\`
-> **Referer**: \`${xssAlert.document.referrer}\`
-> **Victim IP**: [${xssAlert.ip}](https://ipinfo.io/${xssAlert.ip})
-`
-    return message;
-}
-
-function prepareSlackMessage(xssAlert) {
-    const message = `XSS Alert: ${xssAlert.id}
-> *Vulnerable URL*: \`${xssAlert.location.href}\`
-> *User Agent*: \`${xssAlert.userAgent}\`
-> *Cookies*: \`${xssAlert.cookies}\`
-> *Origin*: \`${xssAlert.location.origin}\`
-> *Referer*: \`${xssAlert.document.referrer}\`
-> *Victim IP*: <https://ipinfo.io/${xssAlert.ip}|${xssAlert.ip}>
-`
-    return message;
-}
-
-function prepareTelegramMessage(xssAlert) {
-    var message = `XSS Alert: ${xssAlert.id}
-> *Vulnerable URL*: \`${xssAlert.location.href}\`
-> *User Agent*: \`${xssAlert.userAgent}\`
-> *Cookies*: \`${xssAlert.cookies}\`
-> *Origin*: \`${xssAlert.location.origin}\`
-> *Referer*: \`${xssAlert.document.referrer}\`
-> *Victim IP*: [https://ipinfo.io/${xssAlert.ip}](${xssAlert.ip})
-`
-    return message;
-}
+import { prepareDiscordMessage, prepareSlackMessage, prepareTelegramMessage } from "./prepare-notifications.js";
 
 async function send(xssAlertId){
     // Check what channels are enabled for this alert
@@ -66,23 +31,14 @@ async function send(xssAlertId){
     if (discordEnabled) {
         const discordMessage = prepareDiscordMessage(xssAlert);
         const discordWebhookUrl = settings.find(setting => setting.key === 'discord_webhook').value;
-        await fetch(discordWebhookUrl, {
+        const response = await fetch(discordWebhookUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                content: discordMessage,
-                embeds: [
-                    {
-                        title: 'XSS Alert',
-                        description: discordMessage,
-                        image: {
-                            url: `data:image/png;base64,${btoa(xssAlert.Screenshot.screenshot)}`
-                        },
-                        color: 16711680 // Red color
-                    }
-                ]
-            })
+            body: JSON.stringify(discordMessage)
         });
+        if (response.status != 204){
+            console.log(`Discord response: ${response.status} ${response.statusText} - ${await response.text()}`);
+        }
     }
 
     
@@ -94,22 +50,10 @@ async function send(xssAlertId){
         const response = await fetch(slackWebhookUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                text: 'XSS Alert',
-                blocks: [
-                    {
-                        type: 'section',
-                        text: {
-                            type: 'mrkdwn',
-                            text: slackMessage
-                        }
-                    }
-                ] 
-            })
+            body: JSON.stringify(slackMessage)
         });
-        console.log(`Slack response: ${response.status} ${response.statusText}`);
-        if (response.status == 400){
-            console.log(`Slack error: ${await response.text()}`);
+        if (response.status != 200){
+            console.log(`Slack response: ${response.status} ${response.statusText} - ${await response.text()}`);
         }
     }
 
@@ -129,7 +73,6 @@ async function send(xssAlertId){
                 parse_mode: 'Markdown'
             })
         });
-        console.log(`Telegram response: ${response.status} ${response.statusText} - ${await response.text()}`);
     }
 }
 
