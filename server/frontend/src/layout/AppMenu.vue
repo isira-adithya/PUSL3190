@@ -6,6 +6,7 @@ import AppMenuItem from './AppMenuItem.vue';
 const model = ref([
     {
         label: 'XSSpecter',
+        isVisible: true,
         items: [
             { label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' },
             { label: 'Alerts', icon: 'pi pi-fw pi-bolt', to: '/alerts' },
@@ -14,7 +15,16 @@ const model = ref([
         ]
     },
     {
+        label: 'Administration',
+        isVisible: false,
+        items: [
+            { label: 'Users', icon: 'pi pi-fw pi-address-book', to: '/users' },
+            { label: 'Settings', icon: 'pi pi-fw pi-cog', to: '/settings' },
+        ]
+    },
+    {
         label: 'Links',
+        isVisible: true,
         items: [
             {
                 label: 'Documentation',
@@ -35,7 +45,9 @@ const model = ref([
 const user = JSON.parse(localStorage.getItem('user'));
 if (user) {
     if (user.role === 'ADMIN'){
-        model.value[0].items.push({ label: 'Settings', icon: 'pi pi-fw pi-cog', to: '/settings' });
+        model.value[1].isVisible = true;
+    } else {
+        model.value[1].isVisible = false;
     }
 }
 </script>
@@ -43,7 +55,7 @@ if (user) {
 <template>
     <ul class="layout-menu">
         <template v-for="(item, i) in model">
-            <app-menu-item v-if="!item.separator" :item="item" :index="i" :key="i"></app-menu-item>
+            <app-menu-item v-if="!item.separator && item.isVisible" :item="item" :index="i" :key="i"></app-menu-item>
             <li v-if="item.separator" class="menu-separator" :key="`sep-${i}`"></li>
         </template>
     </ul>

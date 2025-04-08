@@ -46,8 +46,8 @@ onMounted(() => {
         </template>
       </Column>
       <Column style="width: 15%" header="Actions">
-        <template #body>
-          <Button icon="pi pi-search" type="button" class="p-button-text"></Button>
+        <template #body="slotProps">
+          <Button icon="pi pi-search" type="button" class="p-button-text" @click="$router.push(`/alert/${slotProps.data.id}`)"></Button>
         </template>
       </Column>
     </DataTable>

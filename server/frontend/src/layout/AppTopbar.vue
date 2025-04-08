@@ -32,7 +32,7 @@ const { toggleMenu, toggleDarkMode, isDarkTheme } = useLayout();
 
             <div class="layout-topbar-menu hidden lg:block">
                 <div class="layout-topbar-menu-content">
-                    <button type="button" class="layout-topbar-action">
+                    <button type="button" class="layout-topbar-action" @click="$router.push('/account')">
                         <i class="pi pi-user"></i>
                         <span>Profile</span>
                     </button>
