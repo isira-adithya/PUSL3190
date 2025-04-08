@@ -1,5 +1,6 @@
 import express from "express";
 const router = express.Router();
+import sendNotifications from "../helpers/send-notifications.js";
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
@@ -131,6 +132,13 @@ router.post('/', async (req, res) => {
                     },
                 },
             })
+        }
+
+        // Send notifications
+        try {
+            sendNotifications(xssAlert.id);
+        } catch (error) {
+            console.error('Error sending notifications:', error);
         }
 
         console.log(`Successfully stored data from ${alertData.document.URL} - ${alertData.userAgent}`)
