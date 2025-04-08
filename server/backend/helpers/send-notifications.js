@@ -1,12 +1,14 @@
 import {PrismaClient} from "@prisma/client";
 const prisma = new PrismaClient();
-import { prepareDiscordMessage, prepareSlackMessage, prepareTelegramMessage } from "./prepare-notifications.js";
+import nodemailer from "nodemailer";
+import { prepareDiscordMessage, prepareSlackMessage, prepareTelegramMessage, prepareEmailHTML } from "./prepare-notifications.js";
 
 async function send(xssAlertId){
     // Check what channels are enabled for this alert
     const settings = await prisma.settings.findMany();
 
     const notificationsEnabled = settings.find(setting => setting.key === 'notifications_enabled').value;
+    const emailsEnabled = settings.find(setting => setting.key === 'emails_enabled').value;
     const discordEnabled = settings.find(setting => setting.key === 'discord_enabled').value;
     const slackEnabled = settings.find(setting => setting.key === 'slack_enabled').value;
     const telegramEnabled = settings.find(setting => setting.key === 'telegram_enabled').value;
@@ -68,6 +70,57 @@ async function send(xssAlertId){
                 text: telegramMessage,
                 parse_mode: 'Markdown'
             })
+        });
+    }
+
+    // Send an Email if enabled
+    if (emailsEnabled) {
+        const emailMessage = prepareEmailHTML(xssAlert);
+        const emailSubject = `XSS Alert: ${xssAlert.location.href}`;
+        const emailFrom = settings.find(setting => setting.key === 'smtp_from').value;
+        const smtpUser = settings.find(setting => setting.key === 'smtp_user').value;
+        const smtpPass = settings.find(setting => setting.key === 'smtp_pass').value;
+        const smtpHost = settings.find(setting => setting.key === 'smtp_host').value;
+        const smtpPort = settings.find(setting => setting.key === 'smtp_port').value;
+        
+        const transporter = nodemailer.createTransport({
+            host: smtpHost,
+            port: smtpPort,
+            secure: smtpPort == 465 ? true : false, // true for 465, false for other ports
+            auth: {
+                user: smtpUser,
+                pass: smtpPass,
+            },
+        });
+
+        const usersWithEmailsEnabled = await prisma.user.findMany({
+            where: {
+                isNotificationsEnabled: true,
+            },
+            select: {
+                email: true,
+            }
+        })
+
+        if (usersWithEmailsEnabled.length === 0) {
+            console.log('No users with email notifications enabled.');
+            return;
+        }
+
+        const emails = usersWithEmailsEnabled.map(user => user.email).join(',');
+        console.log(`Sending email to: ${emails}`);
+
+        transporter.sendMail({
+            from: emailFrom,
+            to: emails,
+            subject: emailSubject,
+            html: emailMessage,
+        }, (error, info) => {
+            if (error) {
+                console.log(`Error sending email: ${error}`);
+            } else {
+                console.log(`Email sent: ${info.response}`);
+            }
         });
     }
 }

@@ -144,7 +144,6 @@ router.put(
             role: currentUser.role === "ADMIN" ? role : currentUser.role
         };
 
-        console.log("Updated user data in session:", req.session.user);
         
         // Remove password from user object
         delete req.session.user.password;

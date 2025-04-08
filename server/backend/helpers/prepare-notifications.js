@@ -450,7 +450,7 @@ function prepareEmailHTML(xssAlert) {
       </div>
       <div class="footer">
         <p>This is an automated security alert. Please take appropriate action immediately.</p>
-        <p>XSS Alert System • Security Team</p>
+        <p>XSSpecter - XSS Alert</p>
       </div>
     </div>
   </body>
