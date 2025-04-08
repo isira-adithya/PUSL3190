@@ -33,9 +33,27 @@ router.get('/', async (req, res) => {
 });
 
 // update settings
+const allowedKeys = [
+    'notifications_enabled',
+    'emails_enabled',
+    'smtp_host',
+    'smtp_port',
+    'smtp_user',
+    'smtp_pass',
+    'smtp_from',
+    'discord_enabled',
+    'slack_enabled',
+    'telegram_enabled',
+    'discord_webhook',
+    'slack_webhook',
+    'telegram_bot_token',
+    'telegram_chat_id',
+    'ipHeader'
+];
 router.put(
     '/', 
     body('notifications_enabled').isBoolean(),
+    body('emails_enabled').isBoolean(),
     body('smtp_host').isString(),
     body('smtp_port').isInt(),
     body('smtp_user').isString(),
@@ -60,6 +78,9 @@ router.put(
         try {
             const currentSettings = await prisma.settings.findMany();
             for (const setting of currentSettings) {
+                if (!allowedKeys.includes(setting.key)) {
+                    continue;
+                }
                 await prisma.settings.update({
                     where: { key: setting.key },
                     data: {
