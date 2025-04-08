@@ -101,7 +101,7 @@ function prepareDiscordMessage(xssAlert) {
                 }
             ],
             footer: {
-                text: "XSS Alert System • Investigate immediately"
+                text: "XSSpecter • XSS Alert"
             },
             timestamp: new Date().toISOString()
         }]
@@ -203,7 +203,7 @@ function prepareSlackMessage(xssAlert) {
                 elements: [
                     {
                         type: "mrkdwn",
-                        text: "XSS Alert System • Security Team"
+                        text: "XSSpecter • XSS Alert"
                     }
                 ]
             }
@@ -260,9 +260,208 @@ function prepareTelegramMessage(xssAlert) {
     return message.trim();
 }
 
+/**
+ * Prepares HTML email content for XSS alerts
+ * @param {Object} xssAlert - The XSS alert data
+ * @returns {string} HTML formatted email content
+ */
+function prepareEmailHTML(xssAlert) {
+    const severity = determineSeverity(xssAlert);
+    const timestamp = formatTimestamp(xssAlert.timestamp);
+    
+    // Color mapping for email
+    const colorMap = {
+      "Low": "#5865F2",     // Blue
+      "Medium": "#FFCC00",  // Yellow
+      "High": "#FF8800",    // Orange
+      "Critical": "#FF0000" // Red
+    };
+    
+    const severityColor = colorMap[severity] || colorMap["Medium"];
+    
+    return `
+  <!DOCTYPE html>
+  <html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>XSS Alert: ${xssAlert.id}</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        color: #333333;
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .header {
+        background-color: #2C2F33;
+        color: white;
+        padding: 15px 20px;
+        border-radius: 5px 5px 0 0;
+        text-align: center;
+      }
+      .alert-title {
+        margin: 0;
+        font-size: 22px;
+      }
+      .content {
+        background-color: #FFFFFF;
+        padding: 20px;
+        border: 1px solid #E0E0E0;
+        border-top: none;
+        border-radius: 0 0 5px 5px;
+      }
+      .severity-badge {
+        display: inline-block;
+        background-color: ${severityColor};
+        color: white;
+        padding: 5px 10px;
+        border-radius: 3px;
+        font-weight: bold;
+        margin-bottom: 15px;
+      }
+      .info-section {
+        margin-bottom: 20px;
+      }
+      .info-row {
+        margin-bottom: 10px;
+      }
+      .info-label {
+        font-weight: bold;
+        margin-bottom: 3px;
+      }
+      .info-value {
+        background-color: #F5F5F5;
+        padding: 8px;
+        border-radius: 3px;
+        border: 1px solid #E0E0E0;
+        word-break: break-all;
+        font-family: monospace;
+        font-size: 13px;
+      }
+      .info-value-short {
+        display: inline-block;
+        background-color: #F5F5F5;
+        padding: 3px 8px;
+        border-radius: 3px;
+        border: 1px solid #E0E0E0;
+        font-family: monospace;
+        font-size: 13px;
+      }
+      .info-columns {
+        display: table;
+        width: 100%;
+      }
+      .info-column {
+        display: table-cell;
+        width: 50%;
+        padding-right: 10px;
+      }
+      .footer {
+        margin-top: 20px;
+        text-align: center;
+        font-size: 12px;
+        color: #777777;
+      }
+      .action-button {
+        display: inline-block;
+        background-color: #5865F2;
+        color: white;
+        padding: 10px 20px;
+        text-decoration: none;
+        border-radius: 3px;
+        font-weight: bold;
+        margin-top: 10px;
+      }
+      hr {
+        border: none;
+        border-top: 1px solid #E0E0E0;
+        margin: 20px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1 class="alert-title">🚨 XSS Alert: ${xssAlert.id}</h1>
+      </div>
+      <div class="content">
+        <div class="info-section">
+          <div class="severity-badge">Severity: ${severity}</div>
+          <div class="info-columns">
+            <div class="info-column">
+              <div class="info-label">⏰ Detected:</div>
+              <div class="info-value-short">${timestamp}</div>
+            </div>
+            <div class="info-column">
+              <div class="info-label">🌍 Victim IP:</div>
+              <div class="info-value-short">
+                <a href="https://ipinfo.io/${xssAlert.ip}" target="_blank">${xssAlert.ip}</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="info-section">
+          <div class="info-row">
+            <div class="info-label">🔗 Vulnerable URL:</div>
+            <div class="info-value">${xssAlert.location.href}</div>
+          </div>
+        </div>
+        
+        <div class="info-section">
+          <div class="info-columns">
+            <div class="info-column">
+              <div class="info-label">🌐 Origin:</div>
+              <div class="info-value">${xssAlert.location.origin}</div>
+            </div>
+            <div class="info-column">
+              <div class="info-label">↩️ Referer:</div>
+              <div class="info-value">${xssAlert.document.referrer || "N/A"}</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="info-section">
+          <div class="info-row">
+            <div class="info-label">🔍 User Agent:</div>
+            <div class="info-value">${xssAlert.userAgent}</div>
+          </div>
+        </div>
+        
+        <div class="info-section">
+          <div class="info-row">
+            <div class="info-label">🍪 Cookies:</div>
+            <div class="info-value">${xssAlert.cookies || "None"}</div>
+          </div>
+        </div>
+        
+        <hr>
+        
+        <div style="text-align: center;">
+          <a href="#" class="action-button">Investigate Now</a>
+        </div>
+      </div>
+      <div class="footer">
+        <p>This is an automated security alert. Please take appropriate action immediately.</p>
+        <p>XSS Alert System • Security Team</p>
+      </div>
+    </div>
+  </body>
+  </html>
+    `;
+  }
+
 // Export functions for use
 export {
     prepareDiscordMessage,
     prepareSlackMessage,
-    prepareTelegramMessage
+    prepareTelegramMessage,
+    prepareEmailHTML
 };
