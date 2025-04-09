@@ -15,8 +15,7 @@ const adminCheck = (req, res, next) => {
     next();
 }
 
-router.post(
-    "/login", 
+router.post("/login", 
     body("username").isString().notEmpty().withMessage("Username is required"),
     body("password").isString().notEmpty().withMessage("Password is required"),
     async (req, res) => {
@@ -65,7 +64,7 @@ router.post(
                 },
             });
 
-            res.status(200).json({ message: "Login successful" });
+            res.status(200).json({ message: "Login successful", user: req.session.user });
         } catch (err) {
             console.error(err);
             res.status(500).json({ message: "Something went wrong" });
@@ -82,8 +81,7 @@ router.get("/me", async (req, res) => {
 });
 
 // update account
-router.put(
-    "/me", 
+router.put("/me", 
     body("email").isEmail().withMessage("Invalid email format"),
     body("firstName").isString().notEmpty().withMessage("First name is required"),
     body("lastName").isString().notEmpty().withMessage("Last name is required"),
@@ -259,6 +257,57 @@ router.delete("/me", async (req, res) => {
 // admin endpoints
 
 // Users 
+
+// create user
+router.post("/", 
+    adminCheck, 
+    body("username").isString().notEmpty().withMessage("Username is required"),
+    body("password").isString().notEmpty().withMessage("Password is required"),
+    body("email").isEmail().withMessage("Invalid email format"),
+    body("firstName").isString().notEmpty().withMessage("First name is required"),
+    body("lastName").isString().notEmpty().withMessage("Last name is required"),
+    async (req, res) => {
+    const { username, password, email, firstName, lastName } = req.body;
+
+    // Validate request body
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
+    // check if user already exists
+    const existingUser = await prisma.user.findUnique({
+        where: {
+            username: username,
+        },
+    });
+
+    if (existingUser) {
+        return res.status(400).json({ message: "User already exists" });
+    }
+
+    // hash password
+    const hashedPassword = await argon2.hash(password, {
+        timeCost: 5,
+    });
+
+    const user = await prisma.user.create({
+        data: {
+            username,
+            password: hashedPassword,
+            email,
+            firstName,
+            lastName,
+            role: "USER",
+            isActive: true,
+            isNotificationsEnabled: true,
+        },
+    });
+
+    res.status(201).json({ message: "User created successfully" });
+});
+
+// get users
 router.get("/", adminCheck, async (req, res) => {
     // check if limit and offset are provided
     var limit = req.query.limit;
@@ -326,7 +375,7 @@ router.delete("/:id", adminCheck, async (req, res) => {
 
     const result = await prisma.user.delete({
         where: {
-            id: userId,
+            id: parseInt(userId),
         },
     });
 
@@ -360,6 +409,7 @@ router.get("/:id", adminCheck, async (req, res) => {
     res.status(200).json(user);
 });
 
+// update user by id
 router.put("/:id", adminCheck, 
     body("email").isEmail().withMessage("Invalid email format"),
     body("firstName").isString().notEmpty().withMessage("First name is required"),
