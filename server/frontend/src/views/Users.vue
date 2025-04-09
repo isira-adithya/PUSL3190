@@ -2,6 +2,7 @@
     <div class="grid grid-cols-12 gap-8">
         <div class="card col-span-12">
             <div class="font-semibold text-xl mb-4">Users</div>
+            <CreateUserDialog></CreateUserDialog>
             <DataTable :value="users" :paginator="true" :rows="10" dataKey="id" :rowHover="true"
                 v-model:filters="filters" filterDisplay="menu" :loading="loading" :globalFilterFields="['id', 'username', 'email', 'role', 'lastLogin']"
                 showGridlines :totalRecords="totalRecords" lazy :rowsPerPageOptions="[10, 25, 50]" 
@@ -89,6 +90,7 @@
 </template>
 
 <script setup>
+import CreateUserDialog from '@/components/users/CreateUserDialog.vue';
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { FilterMatchMode, FilterOperator } from '@primevue/core/api';
