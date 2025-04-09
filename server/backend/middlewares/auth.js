@@ -36,6 +36,25 @@ async function checkAuth(req, res, next) {
 
   // check if logged in
   if (req.session.isLoggedIn) {
+
+    // Update session user data if it is older than 1 minute
+    if (req.session.user.lastUpdatedDB) {
+      const lastUpdatedDB = new Date(req.session.user.lastUpdatedDB);
+      const currentTime = new Date();
+      const diffInMinutes = Math.floor((currentTime - lastUpdatedDB) / (1000 * 60));
+      if (diffInMinutes >= 1) {
+        // Fetch user data from the database
+        const updatedUser = await prisma.user.findUnique({
+          where: {
+            id: user.id,
+          },
+        });
+        req.session.user = updatedUser;
+        req.session.user.lastUpdatedDB = new Date();
+        delete req.session.user.password;
+      }
+    }
+
     return next();
   } else {
     res.status(403).json({ message: 'Forbidden' });
