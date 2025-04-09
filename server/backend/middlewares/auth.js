@@ -46,7 +46,7 @@ async function checkAuth(req, res, next) {
         // Fetch user data from the database
         const updatedUser = await prisma.user.findUnique({
           where: {
-            id: user.id,
+            id: req.session.user.id,
           },
         });
         req.session.user = updatedUser;

@@ -6,6 +6,15 @@ import * as argon2 from "argon2";
 const router = express.Router();
 const prisma = new PrismaClient();
 
+// admin priv check middleware
+const adminCheck = (req, res, next) => {
+    const user = req.session.user;
+    if (!user || user.role !== "ADMIN") {
+        return res.status(401).json({ message: "Permission denied" });
+    }
+    next();
+}
+
 router.post(
     "/login", 
     body("username").isString().notEmpty().withMessage("Username is required"),
@@ -63,70 +72,11 @@ router.post(
         }
 });
 
-// Users 
-router.get("/", async (req, res) => {
-    const user = req.session.user;
-    if (user.role !== "ADMIN") {
-        return res.status(401).json({ message: "Permission denied" });
-    }
-
-    // check if limit and offset are provided
-    var limit = req.query.limit;
-    var offset = req.query.offset;
-
-    if (!limit || !offset) {
-        return res.status(400).json({ message: 'Limit and offset are required' });
-    }
-
-    limit = parseInt(limit);
-    offset = parseInt(offset);
-
-    if (limit > 50){
-        return res.status(400).json({ message: 'Limit cannot be greater than 50' });
-    }
-
-    const users = await prisma.user.findMany({
-        skip: parseInt(offset),
-        take: parseInt(limit),
-        select: {
-            id: true,
-            username: true,
-            email: true,
-            isActive: true,
-            role: true,
-            lastLogin: true,
-        },
-        orderBy: {
-            id: 'desc'
-        }
-    });
-    if (!users) {
-        return res.status(404).json({ message: "No users found" });
-    }
-    res.status(200).json(users);
-});
-
 // Userdata retrieval
 router.get("/me", async (req, res) => {
     const user = req.session.user;
     if (!user) {
         return res.status(404).json({ message: "User not found" });
-    }
-    if (req.session.user.lastUpdatedDB) {
-        const lastUpdatedDB = new Date(req.session.user.lastUpdatedDB);
-        const currentTime = new Date();
-        const diffInMinutes = Math.floor((currentTime - lastUpdatedDB) / (1000 * 60));
-        if (diffInMinutes >= 1) {
-            // Fetch user data from the database
-            const updatedUser = await prisma.user.findUnique({
-                where: {
-                    id: user.id,
-                },
-            });
-            req.session.user = updatedUser;
-            req.session.user.lastUpdatedDB = new Date();
-            delete req.session.user.password;
-        }
     }
     res.status(200).json(req.session.user);
 });
@@ -305,5 +255,162 @@ router.delete("/me", async (req, res) => {
 
     res.status(200).json({ message: "Account deleted successfully" });
 });
+
+// admin endpoints
+
+// Users 
+router.get("/", adminCheck, async (req, res) => {
+    // check if limit and offset are provided
+    var limit = req.query.limit;
+    var offset = req.query.offset;
+
+    if (!limit || !offset) {
+        return res.status(400).json({ message: 'Limit and offset are required' });
+    }
+
+    limit = parseInt(limit);
+    offset = parseInt(offset);
+
+    if (limit > 50){
+        return res.status(400).json({ message: 'Limit cannot be greater than 50' });
+    }
+
+    const users = await prisma.user.findMany({
+        skip: parseInt(offset),
+        take: parseInt(limit),
+        select: {
+            id: true,
+            username: true,
+            email: true,
+            isActive: true,
+            role: true,
+            lastLogin: true,
+        },
+        orderBy: {
+            id: 'desc'
+        }
+    });
+    if (!users) {
+        return res.status(404).json({ message: "No users found" });
+    }
+    res.status(200).json(users);
+});
+
+// delete route admin
+router.delete("/:id", adminCheck, async (req, res) => {
+    const userId = req.params.id;
+    if (!userId) {
+        return res.status(400).json({ message: "User ID is required" });
+    }
+    if (parseInt(userId) <= 0) {
+        return res.status(400).json({ message: "User ID must be a positive integer" });
+    }
+
+    const user = await prisma.user.findUnique({
+        where: {
+            id: parseInt(userId),
+        },
+        select: {
+            username: true
+        }
+    })
+
+    if (!user) {
+        return res.status(404).json({ message: "User not found" });
+    }
+
+    // default 'admin' user cannot be deleted
+    if (user.username === "admin") {
+        return res.status(401).json({ message: "Default admin user cannot be deleted" });
+    }
+
+    const result = await prisma.user.delete({
+        where: {
+            id: userId,
+        },
+    });
+
+    res.status(200).json({ message: "User deleted successfully" });
+});
+
+// get user by id
+router.get("/:id", adminCheck, async (req, res) => {
+    const userId = req.params.id;
+    if (!userId) {
+        return res.status(400).json({ message: "User ID is required" });
+    }
+    if (parseInt(userId) <= 0) {
+        return res.status(400).json({ message: "User ID must be a positive integer" });
+    }
+
+    const user = await prisma.user.findUnique({
+        where: {
+            id: parseInt(userId),
+        }
+    })
+
+    if (!user) {
+        return res.status(404).json({ message: "User not found" });
+    }
+
+    // remove the password from the user object
+    delete user.password;
+    delete user.apiToken;
+
+    res.status(200).json(user);
+});
+
+router.put("/:id", adminCheck, 
+    body("email").isEmail().withMessage("Invalid email format"),
+    body("firstName").isString().notEmpty().withMessage("First name is required"),
+    body("lastName").isString().notEmpty().withMessage("Last name is required"),
+    body("isActive").isBoolean().withMessage("isActive must be a boolean"),
+    body("isNotificationsEnabled").isBoolean().withMessage("isNotificationsEnabled must be a boolean"),
+    body("role").isString().notEmpty().custom((role) => {
+        const validRoles = ["ADMIN", "USER", "VIEWER"];
+        if (!validRoles.includes(role)) {
+            throw new Error(`Role must be one of: ${validRoles.join(", ")}`);
+        }
+        return true;
+    }).withMessage("Role is required"),
+    async (req, res) => {
+
+        // Validate request body
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+
+        const userId = req.params.id;
+        if (!userId) {
+            return res.status(400).json({ message: "User ID is required" });
+        }
+        if (parseInt(userId) <= 0) {
+            return res.status(400).json({ message: "User ID must be a positive integer" });
+        }
+
+        const { email, firstName, lastName, isActive, isNotificationsEnabled, role } = req.body;
+
+        const result = await prisma.user.update({
+            where: {
+                id: parseInt(userId),
+            },
+            data: {
+                email,
+                firstName,
+                lastName,
+                isNotificationsEnabled,
+                isActive,
+                role
+            },
+        })
+
+        if (!result) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        res.status(200).json({ message: "User updated successfully" });
+    }
+);
 
 export default router;
