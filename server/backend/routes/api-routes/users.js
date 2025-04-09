@@ -63,6 +63,49 @@ router.post(
         }
 });
 
+// Users 
+router.get("/", async (req, res) => {
+    const user = req.session.user;
+    if (user.role !== "ADMIN") {
+        return res.status(401).json({ message: "Permission denied" });
+    }
+
+    // check if limit and offset are provided
+    var limit = req.query.limit;
+    var offset = req.query.offset;
+
+    if (!limit || !offset) {
+        return res.status(400).json({ message: 'Limit and offset are required' });
+    }
+
+    limit = parseInt(limit);
+    offset = parseInt(offset);
+
+    if (limit > 50){
+        return res.status(400).json({ message: 'Limit cannot be greater than 50' });
+    }
+
+    const users = await prisma.user.findMany({
+        skip: parseInt(offset),
+        take: parseInt(limit),
+        select: {
+            id: true,
+            username: true,
+            email: true,
+            isActive: true,
+            role: true,
+            lastLogin: true,
+        },
+        orderBy: {
+            id: 'desc'
+        }
+    });
+    if (!users) {
+        return res.status(404).json({ message: "No users found" });
+    }
+    res.status(200).json(users);
+});
+
 // Userdata retrieval
 router.get("/me", async (req, res) => {
     const user = req.session.user;
