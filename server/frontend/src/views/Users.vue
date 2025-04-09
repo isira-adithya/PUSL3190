@@ -79,8 +79,7 @@
                 </Column>
                 <Column field="actions" header="Actions" style="min-width: 8rem">
                     <template #body="{ data }">
-                        <router-link :to="`/user/${data.id}`"><Button icon="pi pi-search" type="button" class="p-button-text"></Button></router-link>
-                        <Button icon="pi pi-pencil" type="button" class="p-button-text" @click="editUser(data)"></Button>
+                        <Button icon="pi pi-pencil" type="button" class="p-button-text" @click="editUser(data.id)"></Button>
                         <Button icon="pi pi-trash text-red" type="button" class="p-button-text" @click="deleteUser(data.id)"></Button>
                     </template>
                 </Column>
@@ -91,8 +90,11 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import { FilterMatchMode, FilterOperator } from '@primevue/core/api';
 
+const router = useRouter();
+const currentUser = ref({});
 const users = ref([]);
 const loading = ref(true);
 const totalRecords = ref(0);
@@ -150,12 +152,6 @@ const formatDate = (value) => {
     return '';
 };
 
-const editUser = (user) => {
-    // Implementation for editing user
-    console.log('Edit user:', user);
-    // You would typically open a dialog or navigate to an edit page
-};
-
 const deleteUser = async (id) => {
     const response = confirm('Are you sure you want to delete this user?');
     if (!response) return;
@@ -170,7 +166,23 @@ const deleteUser = async (id) => {
     }
 };
 
+const editUser = (id) => {
+
+    if (currentUser.value.id == id){
+        router.push(`/account`);
+    } else {
+        router.push(`/user/${id}`);
+    }
+
+};
+
 onMounted(() => {
     loadUsers(0, rows.value);
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (user) {
+        currentUser.value = user;
+    } else {
+        window.location.href = '/login';
+    }
 });
 </script>
