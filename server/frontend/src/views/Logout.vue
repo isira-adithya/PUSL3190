@@ -34,6 +34,7 @@ onMounted(() => {
         });
         if (!response.ok) {
           console.error("Error during logout:", response);
+          localStorage.setItem("user", JSON.stringify({}));
           router.push("/");
         } else {
           router.push("/auth/login");

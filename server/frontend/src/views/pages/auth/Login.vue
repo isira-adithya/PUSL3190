@@ -22,6 +22,7 @@ const login = async () => {
 
         if (response.ok) {
             const data = await response.json();
+            localStorage.setItem('user', JSON.stringify(data.user));
             toast.add({ severity: 'success', summary: 'Success', detail: 'Login successful!', life: 3000 });
             window.setTimeout(() => {
                 router.push("/");
