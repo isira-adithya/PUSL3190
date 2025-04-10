@@ -323,6 +323,19 @@
               </div>
             </div>
           </TabPanel>
+
+          <!-- Report -->
+          <TabPanel v-if="alert['Report']" header="Report" class="flex flex-col h-screen">
+            <div class="p-4 rounded-lg overflow-auto flex-grow">
+              <div class="space-y-4">
+                <div class="flex justify-end mb-2">
+                  <Button label="Copy Source" icon="pi pi-copy" class="p-button-sm"
+                    @click="copyToClipboard(alert['Report']['description'])" />
+                </div>
+                <iframe :srcdoc="reportSourceParsed" style="width: 100%; height: 80vh;"></iframe>
+              </div>
+            </div>
+          </TabPanel>
         </TabView>
       </div>
     </div>
@@ -340,6 +353,7 @@ const alert = ref(null);
 const loading = ref(true);
 const error = ref(null);
 const documentSourceParsed = ref(null);
+const reportSourceParsed = ref(null);
 
 // Format date for display
 const formatDate = (dateString) => {
@@ -376,7 +390,7 @@ const fetchAlertDetails = async () => {
     alert.value = await response.json();
     if (alert.value['DocumentSource']) {
       documentSourceParsed.value = marked.parse(`\`\`\`html\n${alert.value['DocumentSource']['document']}\n\`\`\``);
-      const bgColor = '#282c34';
+      const bgColor = '#18181b';
       documentSourceParsed.value = `
         <html>
         <head>
@@ -385,6 +399,38 @@ const fetchAlertDetails = async () => {
         </head>
         <body style='background-color: ${bgColor}; color: white; padding: 1rem;'>
         ${documentSourceParsed.value}
+        <script>hljs.highlightAll();<\/script>
+        </body>
+        `
+    }
+
+    if (alert.value['Report']){
+      reportSourceParsed.value = marked.parse(alert.value['Report']['description']);
+      const bgColor = '#18181b';
+      reportSourceParsed.value = `
+        <html>
+        <head>
+        <script src="/app/assets/js/highlightjs/highlight.min.js"><\/script>
+        <link rel="stylesheet" href="/app/assets/js/highlightjs/styles/atom-one-dark.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@200..900&family=Ubuntu+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+        <style>
+        * { 
+          font-family: "Inconsolata", monospace;
+        }
+        pre > code {
+          font-family: "Ubuntu Mono", monospace;
+        }
+        code {
+          font-family: "Ubuntu Mono", monospace;
+          font-weight: 700;
+          color: #34d399;
+        }
+        </style>
+        </head>
+        <body style='background-color: ${bgColor}; color: white; padding: 1rem;'>
+        ${reportSourceParsed.value}
         <script>hljs.highlightAll();<\/script>
         </body>
         `
