@@ -28,6 +28,10 @@ const SETTINGS = {
 
     // ip identification
     ipHeader: "X-Forwarded-For",
+
+    // ai
+    ai_enabled: false,
+    openai_key: "",
 }
 
 async function ensureSettings() {

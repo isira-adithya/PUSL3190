@@ -19,8 +19,11 @@ router.get('/', async (req, res) => {
         const settings = await prisma.settings.findMany();
         const jsonObj = {};
         for (const setting of settings) {
-            // mark the smtp pass
+            // hide the smtp_pass and openai_key
             if (setting.key === 'smtp_pass') {
+                setting.value = '********';
+            }
+            if (setting.key === 'openai_key') {
                 setting.value = '********';
             }
             jsonObj[setting.key] = setting.value;
@@ -48,7 +51,9 @@ const allowedKeys = [
     'slack_webhook',
     'telegram_bot_token',
     'telegram_chat_id',
-    'ipHeader'
+    'ipHeader',
+    'ai_enabled',
+    'openai_key'
 ];
 router.put(
     '/', 
@@ -81,6 +86,15 @@ router.put(
                 if (!allowedKeys.includes(setting.key)) {
                     continue;
                 }
+
+                // if smtp_pass and openai_key == '********', then do not update
+                if (setting.key === 'smtp_pass' && req.body[setting.key] === '********') {
+                    continue;
+                }
+                if (setting.key === 'openai_key' && req.body[setting.key] === '********') {
+                    continue;
+                }
+
                 await prisma.settings.update({
                     where: { key: setting.key },
                     data: {
@@ -91,7 +105,10 @@ router.put(
             const updatedSettings = await prisma.settings.findMany();
             const jsonObj = {};
             for (const setting of updatedSettings) {
-                // mark the smtp pass
+                // hide smtp_pass and openai_key
+                if (setting.key === 'openai_key') {
+                    setting.value = '********';
+                }
                 if (setting.key === 'smtp_pass') {
                     setting.value = '********';
                 }
@@ -107,8 +124,7 @@ router.put(
 );
 
 // test smtp
-router.post(
-    '/test-smtp', 
+router.post('/test-smtp', 
     body('smtp_host').isString(),
     body('smtp_port').isInt(),
     body('smtp_user').isString(),
