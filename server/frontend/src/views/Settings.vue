@@ -3,13 +3,13 @@
     <div class="card col-span-12">
       <Toast />
       <ConfirmDialog group="positioned"></ConfirmDialog>
-      <NotificationsWidget />
+      <SettingsWidget />
     </div>
   </div>
 </template>
 
 <script setup>
-import NotificationsWidget from '@/components/settings/NotificationsWidget.vue';
+import SettingsWidget from '@/components/settings/SettingsWidget.vue';
 import { onMounted } from 'vue';
 
 // Load settings on component mount

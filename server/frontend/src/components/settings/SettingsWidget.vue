@@ -135,7 +135,7 @@
                             <InputText id="telegram_bot_token" v-model="settings.telegram_bot_token" class="w-full"
                                 :disabled="!settings.notifications_enabled || !settings.telegram_enabled" />
                             <small v-if="errors.telegram_bot_token" class="p-error">{{ errors.telegram_bot_token
-                                }}</small>
+                            }}</small>
                         </div>
 
                         <div class="field">
@@ -161,6 +161,25 @@
                             <InputText id="ipHeader" v-model="settings.ipHeader" class="w-full" />
                             <small class="text-gray-600">Header to use for getting client IP address (e.g.
                                 X-Forwarded-For)</small>
+                            <small v-if="errors.ipHeader" class="p-error">{{ errors.ipHeader }}</small>
+                        </div>
+                    </div>
+                </Panel>
+
+                <!-- AI Report Generation Settings -->
+                <Panel header="AI" :toggleable="true" class="mb-6">
+                    <div class="grid grid-cols-1 gap-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-600 dark:text-gray-300 text-sm">Enable AI Features
+                                </p>
+                            </div>
+                            <InputSwitch v-model="settings.ai_enabled" class="ml-4" />
+                        </div>
+                        <div class="field">
+                            <label for="ipHeader" class="block mb-2">OpenAI API Key</label>
+                            <InputText id="ipHeader" :disabled="!settings.ai_enabled" v-model="settings.openai_key" class="w-full" />
+                            <small class="text-gray-600">OpenAI API Key is used to generate AI related content. <a href="https://openai.com/api/" target="_blank" class="text-slate-500"><i>[Learn more]</i></a></small>
                             <small v-if="errors.ipHeader" class="p-error">{{ errors.ipHeader }}</small>
                         </div>
                     </div>
@@ -216,7 +235,9 @@ const defaultSettings = {
     slack_webhook: '',
     telegram_bot_token: '',
     telegram_chat_id: '',
-    ipHeader: 'X-Forwarded-For'
+    ipHeader: 'X-Forwarded-For',
+    ai_enabled: false,
+    openai_key: ""
 };
 
 const settings = reactive({ ...defaultSettings });
