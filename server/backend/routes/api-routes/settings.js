@@ -72,6 +72,8 @@ router.put(
     body('telegram_bot_token').isString(),
     body('telegram_chat_id').isString(),
     body('ipHeader').isString(),
+    body('ai_enabled').isBoolean(),
+    body('openai_key').isString(),
     async (req, res) => {
         // Validate the request body
         const errors = validationResult(req);
