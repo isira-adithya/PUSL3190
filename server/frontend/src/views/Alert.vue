@@ -13,12 +13,15 @@
 
       <div v-else>
         <!-- Header with basic info -->
+        <ConfirmDialog></ConfirmDialog>
+        <Toast />
         <div class="flex justify-between items-center mb-6">
           <div>
             <h1 class="text-2xl font-bold mb-2">Alert #{{ alert.id }}</h1>
             <div class="text-gray-500">{{ formatDate(alert.timestamp) }}</div>
           </div>
           <div>
+            <Button v-if="alert['Report'] == null" severity="info" label="Generate Report" :loading="reportGenerationBusy" icon="pi pi-bolt" class="mr-5" @click="generateReport" />
             <Button label="Back to List" icon="pi pi-arrow-left" @click="goBack" />
           </div>
         </div>
@@ -345,13 +348,20 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { useConfirm } from 'primevue';
+import { useToast } from "primevue/usetoast";
 import { marked } from 'marked';
+
+// primevue functions
+const toast = useToast();
+const confirm = useConfirm();
 
 const route = useRoute();
 const router = useRouter();
 const alert = ref(null);
 const loading = ref(true);
 const error = ref(null);
+const reportGenerationBusy = ref(false);
 const documentSourceParsed = ref(null);
 const reportSourceParsed = ref(null);
 
@@ -373,22 +383,64 @@ const copyToClipboard = (text) => {
   navigator.clipboard.writeText(text);
 };
 
-// Fetch alert details
-const fetchAlertDetails = async () => {
-  loading.value = true;
-  error.value = null;
+// generate ai report
+const generateReport = async () => {
+  confirm.require({
+        message: 'Proceeding may use AI credits. Would you like to continue?',
+        header: 'Confirmation',
+        icon: 'pi pi-info-circle',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Confirm'
+        },
+        accept: async () => {
+            reportGenerationBusy.value = true;
+            try {
+                const alertId = route.params.id;
+                const response = await fetch(`/api/alerts/${alertId}/report`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
 
-  try {
-    const alertId = route.params.id;
-    const response = await fetch(`/api/alerts/${alertId}`);
+                if (response.status == 400){
+                  const jObj = await response.json();
+                  throw new Error(jObj['message'])
+                }
 
-    if (!response.ok) {
-      // redirect to /app/
-      router.push("/")
-    }
+                if (!response.ok) {
+                    throw new Error('Failed to generate report');
+                }
 
-    alert.value = await response.json();
-    if (alert.value['DocumentSource']) {
+                const data = await response.json();
+                alert.value['Report'] = data['report'];
+                parseMarkdown();
+            } catch (err) {
+                console.error('Error generating report:', err);
+                toast.add({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: err.message || 'Failed to generate report',
+                    life: 3000
+                });
+            } finally {
+                reportGenerationBusy.value = false;
+            }
+        },
+        reject: () => {
+            
+        }
+    });
+}
+
+// parse markdown
+const parseMarkdown = () => {
+  if (alert.value['DocumentSource']) {
       documentSourceParsed.value = marked.parse(`\`\`\`html\n${alert.value['DocumentSource']['document']}\n\`\`\``);
       const bgColor = '#18181b';
       documentSourceParsed.value = `
@@ -435,6 +487,24 @@ const fetchAlertDetails = async () => {
         </body>
         `
     }
+}
+
+// Fetch alert details
+const fetchAlertDetails = async () => {
+  loading.value = true;
+  error.value = null;
+
+  try {
+    const alertId = route.params.id;
+    const response = await fetch(`/api/alerts/${alertId}`);
+
+    if (!response.ok) {
+      // redirect to /app/
+      router.push("/")
+    }
+
+    alert.value = await response.json();
+    parseMarkdown();
   } catch (err) {
     console.error('Error fetching alert details:', err);
     error.value = err.message || 'Failed to load alert data';

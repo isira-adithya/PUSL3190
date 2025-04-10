@@ -100,7 +100,7 @@ router.put(
                 await prisma.settings.update({
                     where: { key: setting.key },
                     data: {
-                        value: req.body[setting.key] || setting.value,
+                        value: req.body[setting.key],
                     }
                 });
             }

@@ -131,7 +131,7 @@ router.get('/:id/screenshot', async (req, res) => {
 })
 
 // generate report for an alert
-router.get("/:id/report", async (req, res) => {
+router.post("/:id/report", async (req, res) => {
     const { id } = req.params;
     const forceGenerate = Object.keys(req.query).includes("force");
     
@@ -176,7 +176,7 @@ router.get("/:id/report", async (req, res) => {
             }
 
             const reportContent = await generateReport(alert.id);
-            await prisma.report.create({
+            const newReport = await prisma.report.create({
                 data: {
                     title: `${alert.id}-${new Date().toISOString()}`,
                     description: reportContent,
@@ -187,7 +187,7 @@ router.get("/:id/report", async (req, res) => {
                     }
                 }
             });
-            alert.Report = reportContent;
+            alert.Report = newReport;
         }
 
         return res.json({
