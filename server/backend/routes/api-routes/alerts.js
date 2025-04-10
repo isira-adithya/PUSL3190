@@ -1,6 +1,7 @@
 import express from "express";
 const router = express.Router();
 import { PrismaClient } from "@prisma/client";
+import generateReport from "../../helpers/generate-report.js";
 const prisma = new PrismaClient();
 
 // get alerts
@@ -74,7 +75,8 @@ router.get('/:id', async (req, res) => {
                 scripts: true,
                 metaTags: true,
                 DocumentSource: true,
-                TrackingID: true
+                TrackingID: true,
+                Report: true
             }
         });
         const containsScreenshot = await prisma.screenshot.count({
@@ -121,6 +123,64 @@ router.get('/:id/screenshot', async (req, res) => {
         res.setHeader('Content-Disposition', 'attachment; filename=' + alert.Screenshot.name);
         res.status(200).write(alert.Screenshot.data);
         res.end()
+
+    } catch (err) {
+        console.error(err)
+        res.status(500).json({ message: 'Something went wrong' });
+    }
+})
+
+// generate report for an alert
+router.get("/:id/report", async (req, res) => {
+    const { id } = req.params;
+    const forceGenerate = Object.keys(req.query).includes("force");
+    
+    try {
+        const alert = await prisma.xSSAlert.findUnique({
+            where: {
+                id: parseInt(id)
+            },
+            select: {
+                id: true,
+                Report: true
+            }
+        });
+
+        if (alert == null){
+            return res.status(404).json({
+                message: "Invalid ID"
+            })
+        } 
+
+        if (alert.Report == null || forceGenerate) {
+
+            // if alert.Report exists, delete it
+            if (alert.Report != null){
+                await prisma.report.deleteMany({
+                    where: {
+                        alertId: alert.id
+                    }
+                });
+            }
+
+            const reportContent = await generateReport(alert.id);
+            await prisma.report.create({
+                data: {
+                    title: `${alert.id}-${new Date().toISOString()}`,
+                    description: reportContent,
+                    alert: {
+                        connect: {
+                            id: alert.id
+                        }
+                    }
+                }
+            });
+            alert.Report = reportContent;
+        }
+
+        return res.json({
+            report: alert.Report,
+        })
 
     } catch (err) {
         console.error(err)
