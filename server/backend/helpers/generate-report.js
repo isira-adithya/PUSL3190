@@ -139,7 +139,16 @@ async function generateReport(xssAlertId){
     delete alert.location;
 
 
-    const openaiClient = new OpenAI();
+    // Get the API key from the db
+    const apiKey = await prisma.settings.findFirst({
+        where: {
+            key: "openai_key"
+        }
+    })
+    const openaiClient = new OpenAI({
+        apiKey: apiKey.value
+    });
+
     const response = await openaiClient.responses.create({
         model: 'gpt-4o',
         input: [
