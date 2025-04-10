@@ -154,6 +154,18 @@ router.get("/:id/report", async (req, res) => {
 
         if (alert.Report == null || forceGenerate) {
 
+            // check if ai is enabled
+            const aiEnabled = await prisma.settings.findFirst({
+                where: {
+                    key: "ai_enabled"
+                }
+            });
+            if (aiEnabled == null || aiEnabled.value == false){
+                return res.status(400).json({
+                    message: "AI is disabled"
+                })
+            }
+
             // if alert.Report exists, delete it
             if (alert.Report != null){
                 await prisma.report.deleteMany({
