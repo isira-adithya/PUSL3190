@@ -21,7 +21,7 @@
             <div class="text-gray-500">{{ formatDate(alert.timestamp) }}</div>
           </div>
           <div>
-            <Button v-if="alert['Report'] == null" severity="info" label="Generate Report" :loading="reportGenerationBusy" icon="pi pi-bolt" class="mr-5" @click="generateReport" />
+            <Button v-if="alert['Report'] == null" severity="info" label="Generate Report" :loading="reportGenerationBusy" icon="pi pi-bolt" class="mr-5" @click="generateReport(false)" />
             <Button label="Back to List" icon="pi pi-arrow-left" @click="goBack" />
           </div>
         </div>
@@ -332,6 +332,7 @@
             <div class="p-4 rounded-lg overflow-auto flex-grow">
               <div class="space-y-4">
                 <div class="flex justify-end mb-2">
+                  <Button severity="info" label="Regenerate Report" :loading="reportGenerationBusy" icon="pi pi-bolt" class="mr-5" @click="generateReport(true)" />
                   <Button label="Copy Source" icon="pi pi-copy" class="p-button-sm"
                     @click="copyToClipboard(alert['Report']['description'])" />
                 </div>
@@ -384,7 +385,7 @@ const copyToClipboard = (text) => {
 };
 
 // generate ai report
-const generateReport = async () => {
+const generateReport = async (force=false) => {
   confirm.require({
         message: 'Proceeding may use AI credits. Would you like to continue?',
         header: 'Confirmation',
@@ -401,7 +402,7 @@ const generateReport = async () => {
             reportGenerationBusy.value = true;
             try {
                 const alertId = route.params.id;
-                const response = await fetch(`/api/alerts/${alertId}/report`, {
+                const response = await fetch(`/api/alerts/${alertId}/report${force ? '?force=true' : ''}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
