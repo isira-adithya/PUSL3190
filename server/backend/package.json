@@ -4,10 +4,12 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node index.js",
+    "start": "npm run setupenv && npm run pushdb && npm run generate && node index.js",
+    "setupenv": "echo DATABASE_URL=\"postgresql://xsspecter:$(cat $POSTGRES_PASSWORD_FILE)@db:5432/xsspecter_db?schema=public\" > .env",
     "dev": "nodemon index.js",
     "migrate:dev": "npx prisma migrate dev",
-    "generate": "npx prisma generate"
+    "generate": "npx prisma generate",
+    "pushdb": "npx prisma db push"
   },
   "dependencies": {
     "@prisma/client": "^6.4.1",

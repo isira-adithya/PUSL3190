@@ -2,14 +2,23 @@ import express from "express";
 import expressSession from "express-session";
 import { PrismaClient } from "@prisma/client";
 import { PrismaSessionStore } from '@quixo3/prisma-session-store';
+import { readFileSync } from "fs";
 const router = express.Router();
+
+// If process.env.SESSION_SECRET is not set, load it from process.env.SESSION_SECRET_FILE
+if (!process.env.SESSION_SECRET) {
+    if (!process.env.SESSION_SECRET_FILE) {
+        throw new Error("SESSION_SECRET_FILE is not set");
+    }
+    console.log(`Loading SESSION_SECRET from ${process.env.SESSION_SECRET_FILE}`);
+    process.env.SESSION_SECRET = readFileSync(process.env.SESSION_SECRET_FILE, "utf8").trim();
+}
 
 // Session Handler
 router.use(
     expressSession({
         cookie: {
          maxAge: 7 * 24 * 60 * 60 * 1000, // ms
-         secure: process.env.NODE_ENV == "development" ? false : true, // Set to true if using HTTPS
          httpOnly: true,
          sameSite: 'strict',
         },
