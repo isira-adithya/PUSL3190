@@ -1,0 +1,55 @@
+services:
+  backend:
+    build:
+      context: ./backend/
+      target: production
+    depends_on:
+      - db
+    networks:
+      - app-network
+    environment:
+      SESSION_SECRET_FILE: /run/secrets/express_session_secret
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+    secrets:
+      - express_session_secret
+      - db_password
+    restart: always
+
+  frontend:
+    build:
+      context: ./frontend/
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+    networks:
+      - app-network
+    restart: always
+    ports:
+      - "80:80"
+
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: xsspecter
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+      POSTGRES_DB: xsspecter_db
+    secrets:
+      - db_password
+    volumes:
+      - xsspecter-db-data:/var/lib/postgresql/data
+    networks:
+      - app-network
+    restart: always
+
+networks:
+  app-network:
+    driver: bridge
+
+secrets:
+  db_password:
+    file: ./secrets/db-pass.txt
+  express_session_secret:
+    file: ./secrets/express-session-secret.txt
+
+volumes:
+  xsspecter-db-data:
