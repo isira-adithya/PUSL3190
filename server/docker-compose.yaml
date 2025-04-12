@@ -10,9 +10,12 @@ services:
     environment:
       SESSION_SECRET_FILE: /run/secrets/express_session_secret
       POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+      ADMIN_PASS_FILE: /run/secrets/admin_password
     secrets:
       - express_session_secret
       - db_password
+      - admin_password
+
     restart: always
 
   frontend:
@@ -50,6 +53,8 @@ secrets:
     file: ./secrets/db-pass.txt
   express_session_secret:
     file: ./secrets/express-session-secret.txt
+  admin_password:
+    file: ./secrets/admin-pass.txt
 
 volumes:
   xsspecter-db-data:
