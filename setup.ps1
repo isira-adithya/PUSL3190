@@ -89,19 +89,7 @@ function Get-SecurePassword {
     }
     
     # Save the password to the file
-    $Password | Out-File -FilePath $FilePath -Force
-    
-    # Secure file permissions - restrict to current user only
-    $Acl = Get-Acl -Path $FilePath
-    $Acl.SetAccessRuleProtection($true, $false)
-    $Identity = [System.Security.Principal.WindowsIdentity]::GetCurrent().Name
-    $FileSystemRights = [System.Security.AccessControl.FileSystemRights]::FullControl
-    $InheritanceFlags = [System.Security.AccessControl.InheritanceFlags]::None
-    $PropagationFlags = [System.Security.AccessControl.PropagationFlags]::None
-    $AccessControlType = [System.Security.AccessControl.AccessControlType]::Allow
-    $Rule = New-Object System.Security.AccessControl.FileSystemAccessRule($Identity, $FileSystemRights, $InheritanceFlags, $PropagationFlags, $AccessControlType)
-    $Acl.AddAccessRule($Rule)
-    Set-Acl -Path $FilePath -AclObject $Acl
+    $Password | Out-File -FilePath $FilePath -Force -Encoding ASCII -NoNewline
     
     Write-Host "$($Colors.GREEN)Password for $SecretName saved to $FilePath$($Colors.NC)"
 }
