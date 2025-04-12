@@ -125,6 +125,13 @@ echo
 db_pass_path="./server/secrets/db-pass.txt"
 get_password "PostgreSQL Database Password" "$db_pass_path"
 
+echo
+
+# Generate Admin password
+admin_pass_path="./server/secrets/admin-pass.txt"
+get_password "Admin User" "$admin_pass_path"
+echo -e "${YELLOW}NOTE: It is strongly recommended to change the admin password after first login.${NC}"
+
 echo -e "${GREEN}All secrets have been generated successfully!${NC}"
 echo -e "${YELLOW}IMPORTANT: Keep these secret files secure and do not commit them to version control.${NC}"
 

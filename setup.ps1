@@ -150,6 +150,13 @@ Write-Host ""
 $DbPassPath = "./server/secrets/db-pass.txt"
 Get-SecurePassword -SecretName "PostgreSQL Database Password" -FilePath $DbPassPath
 
+Write-Host ""
+
+# Generate Admin password
+$AdminPassPath = "./server/secrets/admin-pass.txt"
+Get-SecurePassword -SecretName "Admin Password" -FilePath $AdminPassPath
+Write-Host "$($Colors.YELLOW)IMPORTANT: It is strongly recommended to change the admin password after first login.$($Colors.NC)"
+
 Write-Host "$($Colors.GREEN)All secrets have been generated successfully!$($Colors.NC)"
 Write-Host "$($Colors.YELLOW)IMPORTANT: Keep these secret files secure and do not commit them to version control.$($Colors.NC)"
 
