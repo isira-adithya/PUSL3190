@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "npm run setupenv && npm run pushdb && npm run generate && node index.js",
-    "setupenv": "echo DATABASE_URL=\"postgresql://xsspecter:$(cat $POSTGRES_PASSWORD_FILE)@db:5432/xsspecter_db?schema=public\" > .env",
+    "setupenv": "echo DATABASE_URL=\"postgresql://xsspecter:$(cat $POSTGRES_PASSWORD_FILE | xxd -p|tr -d \\\\n|sed 's/../%&/g')@db:5432/xsspecter_db?schema=public\" > .env",
     "dev": "nodemon index.js",
     "migrate:dev": "npx prisma migrate dev",
     "generate": "npx prisma generate",
