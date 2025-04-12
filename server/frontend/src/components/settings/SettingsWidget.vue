@@ -157,11 +157,11 @@
                 <Panel header="Advanced Settings" :toggleable="true" class="mb-6">
                     <div class="grid grid-cols-1 gap-4">
                         <div class="field">
-                            <label for="ipHeader" class="block mb-2">IP Header</label>
-                            <InputText id="ipHeader" v-model="settings.ipHeader" class="w-full" />
+                            <label for="ip_header" class="block mb-2">IP Header</label>
+                            <InputText id="ip_header" v-model="settings.ip_header" class="w-full" />
                             <small class="text-gray-600">Header to use for getting client IP address (e.g.
                                 X-Forwarded-For)</small>
-                            <small v-if="errors.ipHeader" class="p-error">{{ errors.ipHeader }}</small>
+                            <small v-if="errors.ip_header" class="p-error">{{ errors.ip_header }}</small>
                         </div>
                     </div>
                 </Panel>
@@ -177,10 +177,10 @@
                             <InputSwitch v-model="settings.ai_enabled" class="ml-4" />
                         </div>
                         <div class="field">
-                            <label for="ipHeader" class="block mb-2">OpenAI API Key</label>
-                            <InputText id="ipHeader" :disabled="!settings.ai_enabled" v-model="settings.openai_key" class="w-full" />
+                            <label for="ip_header" class="block mb-2">OpenAI API Key</label>
+                            <InputText id="ip_header" :disabled="!settings.ai_enabled" v-model="settings.openai_key" class="w-full" />
                             <small class="text-gray-600">OpenAI API Key is used to generate AI related content. <a href="https://openai.com/api/" target="_blank" class="text-slate-500"><i>[Learn more]</i></a></small>
-                            <small v-if="errors.ipHeader" class="p-error">{{ errors.ipHeader }}</small>
+                            <small v-if="errors.ip_header" class="p-error">{{ errors.ip_header }}</small>
                         </div>
                     </div>
                 </Panel>
@@ -235,7 +235,7 @@ const defaultSettings = {
     slack_webhook: '',
     telegram_bot_token: '',
     telegram_chat_id: '',
-    ipHeader: 'X-Forwarded-For',
+    ip_header: 'X-Forwarded-For',
     ai_enabled: false,
     openai_key: ""
 };

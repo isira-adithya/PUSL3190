@@ -28,7 +28,7 @@ const SETTINGS = {
     telegram_chat_id: "",
 
     // ip identification
-    ipHeader: "X-Forwarded-For",
+    ip_header: "X-Forwarded-For",
 
     // ai
     ai_enabled: false,

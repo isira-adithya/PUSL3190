@@ -51,7 +51,7 @@ const allowedKeys = [
     'slack_webhook',
     'telegram_bot_token',
     'telegram_chat_id',
-    'ipHeader',
+    'ip_header',
     'ai_enabled',
     'openai_key'
 ];
@@ -71,7 +71,7 @@ router.put(
     body('slack_webhook').isURL(),
     body('telegram_bot_token').isString(),
     body('telegram_chat_id').isString(),
-    body('ipHeader').isString(),
+    body('ip_header').isString(),
     body('ai_enabled').isBoolean(),
     body('openai_key').isString(),
     async (req, res) => {
