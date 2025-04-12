@@ -17,6 +17,23 @@ router.post('/', async (req, res) => {
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
+    // Getting the correct IP
+    var correctIp = req.ip;
+    const customHeader = await prisma.settings.findFirst({
+        where: {
+            key: "ip_header"
+        }
+    })
+    if (customHeader) {
+        const ipHeader = customHeader.value.toLowerCase();
+        console.log(ipHeader)
+        console.log(req.headers)
+        if (ipHeader) {
+            correctIp = req.headers[ipHeader] || req.ip;
+        }
+    }
+    res.setHeader('X-Detected-IP', correctIp);
+
     try {
         var trackingId = null;
         const alertData = req.body;
@@ -29,7 +46,7 @@ router.post('/', async (req, res) => {
                 timezoneName: alertData.timezoneName,
                 currentTime: alertData.currentTime,
                 isInIframe: alertData.isInIframe,
-                ip: req.ip,
+                ip: correctIp,
 
                 document: {
                     create: {
