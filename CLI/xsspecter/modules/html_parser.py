@@ -1,5 +1,5 @@
 from bs4 import BeautifulSoup
-from modules.form_processor import FormProcessor
+from xsspecter.modules.form_processor import FormProcessor
 from urllib.parse import urljoin, urlparse
 
 class HTMLParser:

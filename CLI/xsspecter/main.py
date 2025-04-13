@@ -3,11 +3,11 @@ from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TaskID
 import validators
 from pathlib import Path
-from modules.web_crawler import WebCrawler
-from modules.result_exporter import ResultExporter
-from modules.config import Config
-from modules.payload_generator import PayloadGenerator
-from modules.payload_spray import PayloadSpray
+from xsspecter.modules.web_crawler import WebCrawler
+from xsspecter.modules.result_exporter import ResultExporter
+from xsspecter.modules.config import Config
+from xsspecter.modules.payload_generator import PayloadGenerator
+from xsspecter.modules.payload_spray import PayloadSpray
 
 config = Config()
 app = typer.Typer(help="XSSpecter - CLI")

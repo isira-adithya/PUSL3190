@@ -6,7 +6,7 @@ from rich.console import Console
 import validators
 from rich.progress import Progress, TaskID
 from typing import Optional, Set, Dict
-from modules.html_parser import HTMLParser
+from xsspecter.modules.html_parser import HTMLParser
 
 class WebCrawler:
     def __init__(self, base_url: str, max_depth: int = 2, max_pages: int = 100, should_crawl: bool = False, proxy: str = None, insecure: bool = False):

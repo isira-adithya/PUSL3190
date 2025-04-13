@@ -1,4 +1,4 @@
-from modules.config import Config
+from xsspecter.modules.config import Config
 import urllib.parse
 import requests
 from requests_toolbelt import MultipartEncoder
