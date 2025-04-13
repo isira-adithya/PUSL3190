@@ -15,7 +15,7 @@ setup(
     author="Isira Adithya",
     author_email="me@isiraadithya.com",
     url="https://github.com/username/package",
-    packages=find_packages(),
+    packages=["xsspecter", "modules"],
     install_requires=requirements,
     entry_points={
         "console_scripts": [
