@@ -78,10 +78,11 @@ get_password() {
     else
         echo -e "${GREEN}Generating a strong random password for ${secret_name}...${NC}"
         password=$(generate_password)
+        echo -e "${GREEN}Generated password: ${password}${NC}"
     fi
     
     # Save the password to the file
-    echo "$password" > "$file_path"
+    echo -n "$password" > "$file_path"
     chmod 600 "$file_path" # Secure file permissions
     
     echo -e "${GREEN}Password for ${secret_name} saved to ${file_path}${NC}"
@@ -98,7 +99,7 @@ run_docker_compose() {
         
         if [ -f "docker-compose.yml" ] || [ -f "docker-compose.yaml" ]; then
             echo -e "${GREEN}Starting the application with docker-compose...${NC}"
-            docker-compose up
+            docker-compose up -d
         else
             echo -e "${RED}Error: docker-compose.yml file not found in ./server directory${NC}"
         fi

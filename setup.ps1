@@ -86,6 +86,7 @@ function Get-SecurePassword {
     } else {
         Write-Host "$($Colors.GREEN)Generating a strong random password for $SecretName$($Colors.NC)..."
         $Password = Generate-Password
+        Write-Host "$($Colors.GREEN)Generated password: $Password$($Colors.NC)"
     }
     
     # Save the password to the file
@@ -106,7 +107,7 @@ function Run-DockerCompose {
             
             if ((Test-Path -Path "docker-compose.yml") -or (Test-Path -Path "docker-compose.yaml")) {
                 Write-Host "$($Colors.GREEN)Starting the application with docker-compose...$($Colors.NC)"
-                & docker-compose up
+                & docker-compose up -d
             } else {
                 Write-Host "$($Colors.RED)Error: docker-compose.yml file not found in ./server directory$($Colors.NC)"
             }
