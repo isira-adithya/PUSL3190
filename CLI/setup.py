@@ -9,7 +9,7 @@ with open("README.md") as f:
 setup(
     name="xsspecter",
     version="0.1.0",
-    description="XS Specter - XSS detection tool",  # Update with your actual description
+    description="XSSpecter - XSS detection tool",  # Update with your actual description
     long_description=long_description,
     long_description_content_type="text/markdown",
     author="Isira Adithya",
@@ -24,8 +24,6 @@ setup(
     },
     classifiers=[
         "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: MIT License",  # Choose appropriate license
-        "Operating System :: OS Independent",
     ],
-    python_requires=">=3.6",
+    python_requires=">=3.10",
 )
