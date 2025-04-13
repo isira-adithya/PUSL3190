@@ -86,5 +86,8 @@ def spray(
     ResultExporter.export_json(crawler.results, output)
     console.print(f"[green]Results exported to {output}[/green]")
 
-if __name__ == "__main__":
+def main():
     app()
+
+if __name__ == "__main__":
+    main()
