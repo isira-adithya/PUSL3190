@@ -22,8 +22,12 @@ class PayloadGenerator:
         try:
             response = requests.post(f'http://{self.config.domain}/api/cli/track', json=payload, headers={'Content-Type': 'application/json', 'Authorization': f"Token {self.config.api_key}"})
             if response.status_code != 200:
-                print(f"Error sending payload to server: {response.status_code} - {response.text}")
-                exit()
+                if (response.status_code == 403):
+                    print(f"Invalid API key. Please check your config file. ({Config().config_location})")
+                    exit()
+                else:
+                    print(f"Error sending payload to server: {response.status_code} - {response.text}")
+                    exit()
         except requests.exceptions.RequestException as e:
             print(f"Error sending payload to server: {e}")
             exit()

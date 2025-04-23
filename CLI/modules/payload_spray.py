@@ -41,26 +41,23 @@ class PayloadSpray:
     def generate_query(self, data):
         config = Config()
 
-        # for data.key generate data.key=data.value&data.key=data.value
-        query = ''
-        urlEncodedPayload = urllib.parse.quote_plus(self.payload)
+        query_dict = {}
         for key in data:
             # Ignore keys with csrf_token, session_id, cookie, token, etc.
             if key.lower() in config.IGNORE_KEYS:
-                query += f'{key}={data[key]["value"]}&'
+                query_dict[key] = data[key]["value"]
             # Check if the key type is a specific one, if so use suitable values
             elif (data[key].get('type') == 'email'):
-                query += f'{key}={config.DEFAULT_EMAIL}&'
+                query_dict[key] = config.DEFAULT_EMAIL
             elif (data[key].get('type') == 'url'):
-                query += f'{key}={config.DEFAULT_NUMBER}&'
+                query_dict[key] = config.DEFAULT_NUMBER
             elif (data[key].get('type') == 'number'):
-                query += f'{key}={config.DEFAULT_NUMBER}&'
+                query_dict[key] = config.DEFAULT_NUMBER
             elif (data[key].get('type') == 'tel'):
-                query += f'{key}={config.DEFAULT_PHONE}&'
+                query_dict[key] = config.DEFAULT_PHONE
             else:
-                # query += f'{key}={data[key]}&'
-                query += f'{key}={urlEncodedPayload}&'
-        return query[:-1]
+                query_dict[key] = self.payload
+        return urllib.parse.urlencode(query_dict)
 
     def run(self):
         if (self.target.get('method').lower() == 'get'):
