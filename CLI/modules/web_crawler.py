@@ -10,7 +10,7 @@ from typing import Optional, Set, Dict
 from modules.html_parser import HTMLParser
 
 class WebCrawler:
-    def __init__(self, base_url: str, max_depth: int = 2, max_pages: int = 100, should_crawl: bool = False, proxy: str = None, insecure: bool = False, headers: List[str] = []):
+    def __init__(self, base_url: str, max_depth: int = 2, max_pages: int = 100, should_crawl: bool = False, proxy: str = None, insecure: bool = False, headers: List[str] = [], cookies: str = None):
         self.base_url = base_url
         self.max_depth = max_depth
         self.max_pages = max_pages
@@ -32,7 +32,7 @@ class WebCrawler:
         self.http_session.headers.update({
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
         })
-        if headers:
+        if len(headers) > 0:
             for header in headers:
                 key, value = header.split(':', 1)
                 # Validate header format
@@ -40,6 +40,16 @@ class WebCrawler:
                     raise ValueError(f"Invalid header format: {header}. Expected 'Key: Value'.")
                 # Add header to session
                 self.http_session.headers[key.strip()] = value.strip()
+        if cookies:
+            cookies = cookies.strip()
+            c_key_pairs = cookies.split(';')
+            for c_key_pair in c_key_pairs:
+                ckey, cval = c_key_pair.split('=', 1)
+                # Validate cookie format
+                if not ckey or not cval:
+                    raise ValueError(f"Invalid cookie format: {c_key_pair}. Expected 'Key=Value'.")
+                # Add cookie to session
+                self.http_session.cookies[ckey.strip()] = cval.strip()
         
     def is_valid_url(self, url: str) -> bool:
         """Check if URL is valid and belongs to the same domain."""

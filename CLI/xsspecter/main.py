@@ -32,7 +32,10 @@ def spray(
         False, help="Ignore SSL certificate warnings."
     ),
     headers: List[str] = typer.Option(
-        None, help="Custom headers to include in requests (format: key1:value1)."
+        [], help="Custom headers to include in requests (format: key1:value1). Use multiple times for multiple headers. (e.g. --headers key1:value1 --headers key2:value2)"
+    ),
+    cookies: str = typer.Option(
+        [], help="Cookies to include in requests (format: \"key1=value1;key2=value2;\")."
     ),
 ):
     """
@@ -55,7 +58,7 @@ def spray(
         console.print(f"Crawling: [red]Disabled[/red]")
     console.print(f"Output File: {output}")
     
-    crawler = WebCrawler(base_url=url, max_depth=depth, max_pages=max_pages, should_crawl=crawl, proxy=proxy, insecure=insecure, headers=headers)
+    crawler = WebCrawler(base_url=url, max_depth=depth, max_pages=max_pages, should_crawl=crawl, proxy=proxy, insecure=insecure, headers=headers, cookies=cookies)
     
     # Create a single progress instance for the entire crawling process
     progress = Progress(
