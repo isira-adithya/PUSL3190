@@ -1,4 +1,5 @@
 import typer
+from typing import List
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TaskID
 import validators
@@ -30,6 +31,9 @@ def spray(
     insecure: bool = typer.Option(
         False, help="Ignore SSL certificate warnings."
     ),
+    headers: List[str] = typer.Option(
+        None, help="Custom headers to include in requests (format: key1:value1)."
+    ),
 ):
     """
     Spray payloads to the given URL and save the results to a JSON file.
@@ -51,7 +55,7 @@ def spray(
         console.print(f"Crawling: [red]Disabled[/red]")
     console.print(f"Output File: {output}")
     
-    crawler = WebCrawler(base_url=url, max_depth=depth, max_pages=max_pages, should_crawl=crawl, proxy=proxy, insecure=insecure)
+    crawler = WebCrawler(base_url=url, max_depth=depth, max_pages=max_pages, should_crawl=crawl, proxy=proxy, insecure=insecure, headers=headers)
     
     # Create a single progress instance for the entire crawling process
     progress = Progress(

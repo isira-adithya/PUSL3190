@@ -1,4 +1,5 @@
 import requests
+from typing import List
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin, urlparse
 from datetime import datetime
@@ -9,7 +10,7 @@ from typing import Optional, Set, Dict
 from modules.html_parser import HTMLParser
 
 class WebCrawler:
-    def __init__(self, base_url: str, max_depth: int = 2, max_pages: int = 100, should_crawl: bool = False, proxy: str = None, insecure: bool = False):
+    def __init__(self, base_url: str, max_depth: int = 2, max_pages: int = 100, should_crawl: bool = False, proxy: str = None, insecure: bool = False, headers: List[str] = []):
         self.base_url = base_url
         self.max_depth = max_depth
         self.max_pages = max_pages
@@ -28,6 +29,17 @@ class WebCrawler:
         if insecure:
             requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
         self.http_session.verify = not insecure
+        self.http_session.headers.update({
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
+        })
+        if headers:
+            for header in headers:
+                key, value = header.split(':', 1)
+                # Validate header format
+                if not key or not value:
+                    raise ValueError(f"Invalid header format: {header}. Expected 'Key: Value'.")
+                # Add header to session
+                self.http_session.headers[key.strip()] = value.strip()
         
     def is_valid_url(self, url: str) -> bool:
         """Check if URL is valid and belongs to the same domain."""
