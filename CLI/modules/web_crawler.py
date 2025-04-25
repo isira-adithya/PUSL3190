@@ -8,7 +8,9 @@ import validators
 from rich.progress import Progress, TaskID
 from typing import Optional, Set, Dict
 from modules.html_parser import HTMLParser
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from collections import deque
+import threading
 
 class WebCrawler:
     def __init__(self, base_url: str, max_depth: int = 2, max_pages: int = 100, should_crawl: bool = False, proxy: str = None, insecure: bool = False, headers: List[str] = [], cookies: str = None, thread_count: int = 5):
@@ -16,17 +18,21 @@ class WebCrawler:
         self.max_depth = max_depth
         self.max_pages = max_pages
         self.visited_urls: Set[str] = set()
+        self.in_progress_urls: Set[str] = set()
+        self.url_lock = threading.Lock()
         self.results = []
         self.console = Console()
         self.progress: Optional[Progress] = None
         self.tasks: Dict[str, TaskID] = {}
         self.identified_forms = []
         self.should_crawl = should_crawl
+        
+        # URL depth tracking
+        self.url_depths: Dict[str, int] = {base_url: 0}
 
         # Threading related stuff
         self.thread_count = thread_count
         self.executor = ThreadPoolExecutor(max_workers=self.thread_count)
-
 
         # HTTP Session Related Stuff
         self.http_session = requests.Session()
@@ -66,12 +72,9 @@ class WebCrawler:
             return False
         return urlparse(url).netloc == urlparse(self.base_url).netloc
     
-    def get_links(self, url: str) -> set:
+    def get_links(self, response: requests.Response, url) -> set:
         """Extract all links from a webpage."""
         try:
-            response = self.http_session.get(url, timeout=10)
-            print(f"Got the response for {url}")
-            response.raise_for_status()
             soup = BeautifulSoup(response.text, 'html.parser')
             links = set()
             
@@ -98,20 +101,11 @@ class WebCrawler:
             'status_code': response.status_code,
             'crawled_at': datetime.now().isoformat()
         }
-    
-    def crawl(self, url: str, depth: int = 0):
-        """Recursively crawl the website starting from the given URL."""
-        if (
-            depth > self.max_depth or 
-            url in self.visited_urls or 
-            len(self.visited_urls) >= self.max_pages
-        ):
-            return
-        
-        self.visited_urls.add(url)
-        
+
+    def _process_url(self, url: str) -> Set[str]:
+        """Process a single URL and return new discovered URLs."""
         try:
-            # update progress for the console
+            # Update progress for the console
             if self.progress:
                 task_id = self.progress.add_task(
                     description=f"Crawling {url}", 
@@ -123,40 +117,100 @@ class WebCrawler:
             response = self.http_session.get(url, timeout=10)
             response.raise_for_status()
 
-            # identify forms
+            # Identify forms
             html_parser = HTMLParser(url, response.text)
             identified_forms = html_parser.extract_forms()
             self.identified_forms.extend(identified_forms)
             
-            # extract page information
+            # Extract page information
             page_info = self.extract_page_info(url, response)
             self.results.append(page_info)
             
-            # mark as done in progress for the console
+            # Mark as done in progress for the console
             if self.progress and url in self.tasks:
                 self.progress.update(self.tasks[url], visible=False)
             
-            # get links and keep crawling
-            links = self.get_links(url)
-            if (self.should_crawl):
-                futures = []
-                print(f"Future Pool: {len(futures)}")
+            # Get links
+            links = self.get_links(response=response, url=url)
+            
+            # Return discovered links for further crawling if we're below max_depth
+            current_depth = self.url_depths.get(url, 0)
+            if current_depth < self.max_depth:
+                # Record depths for new URLs
                 for link in links:
-                    # Check if self.executor has max_workers threads running
-                    if len(futures) >= self.thread_count:
-                        # Wait for the first future to complete
-                        completed_future = futures.pop(0)
-                        completed_future.result()
-                    # self.visited_urls.add(link)
-                    future = self.executor.submit(self.crawl, link, depth + 1)
-                    futures.append(future)
-
-                for future in futures:
-                    future.result()
-
-            return    
+                    if link not in self.url_depths:
+                        self.url_depths[link] = current_depth + 1
+                return links
+            
+            return set()
             
         except Exception as e:
-            self.console.print(f"[red]Error crawling {url}: {str(e)}[/red]")
+            self.console.print(f"[red]Error processing {url}: {str(e)}[/red]")
             if self.progress and url in self.tasks:
                 self.progress.update(self.tasks[url], visible=False)
+            return set()
+
+    def crawl(self, url: str = None, depth: int = 0):
+        # Default to base_url if none provided
+        if url is None:
+            url = self.base_url
+        
+        # Only crawl if explicitly enabled
+        if not self.should_crawl:
+            if url not in self.visited_urls:
+                self.visited_urls.add(url)
+                self._process_url(url)
+            return
+        
+        # Queue-based crawling to prevent deadlocks
+        to_crawl = deque([url])
+        self.url_depths[url] = depth
+        
+        while to_crawl and len(self.visited_urls) < self.max_pages:
+            # Take a batch of URLs to process in parallel
+            batch = []
+            for _ in range(min(self.thread_count, len(to_crawl))):
+                if not to_crawl:
+                    break
+                    
+                current_url = to_crawl.popleft()
+                
+                # Use a lock to safely check and update tracking sets
+                with self.url_lock:
+                    if current_url not in self.visited_urls and current_url not in self.in_progress_urls:
+                        batch.append(current_url)
+                        self.visited_urls.add(current_url)
+                        self.in_progress_urls.add(current_url)
+            
+            if not batch:
+                continue
+                
+            # Process the batch in parallel
+            futures = {self.executor.submit(self._process_url, url): url for url in batch}
+            
+            # Collect results and new URLs to crawl
+            for future in as_completed(futures):
+                current_url = futures[future]
+                try:
+                    new_urls = future.result()
+                    
+                    # Mark URL as no longer in progress
+                    with self.url_lock:
+                        self.in_progress_urls.remove(current_url)
+                    
+                    # Add new URLs to the crawl queue if they haven't been visited
+                    for new_url in new_urls:
+                        with self.url_lock:
+                            if new_url not in self.visited_urls and new_url not in self.in_progress_urls and len(self.visited_urls) < self.max_pages:
+                                current_depth = self.url_depths.get(current_url, 0)
+                                self.url_depths[new_url] = current_depth + 1
+                                
+                                # Only add URLs that don't exceed max_depth
+                                if self.url_depths[new_url] <= self.max_depth:
+                                    to_crawl.append(new_url)
+                except Exception as e:
+                    # Make sure to remove URL from in_progress even if there's an error
+                    with self.url_lock:
+                        if current_url in self.in_progress_urls:
+                            self.in_progress_urls.remove(current_url)
+                    self.console.print(f"[red]Error handling result for {current_url}: {str(e)}[/red]")
