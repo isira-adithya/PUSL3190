@@ -26,9 +26,6 @@ class WebCrawler:
         self.tasks: Dict[str, TaskID] = {}
         self.identified_forms = []
         self.should_crawl = should_crawl
-        
-        # URL depth tracking
-        self.url_depths: Dict[str, int] = {base_url: 0}
 
         # Threading related stuff
         self.thread_count = thread_count
@@ -58,6 +55,8 @@ class WebCrawler:
             cookies = cookies.strip()
             c_key_pairs = cookies.split(';')
             for c_key_pair in c_key_pairs:
+                if not c_key_pair or '=' not in c_key_pair:
+                    continue
                 ckey, cval = c_key_pair.split('=', 1)
                 # Validate cookie format
                 if not ckey or not cval:
@@ -88,6 +87,23 @@ class WebCrawler:
         except Exception as e:
             self.console.print(f"[red]Error processing {url}: {str(e)}[/red]")
             return set()
+    
+    def get_depth(self, url: str) -> int:
+        """Get the depth of a URL."""
+        # parse the url
+        parsed_url = urlparse(url)
+
+        # get the path of the url
+        path = parsed_url.path
+        
+        # check if the path is empty
+        if not path:
+            return 0
+        else:
+            # split the path into parts
+            parts = path.split('/')
+            print("URL Parts:", len(parts) - 1)
+            return len(parts) - 1
     
     def extract_page_info(self, url: str, response: requests.Response) -> dict:
         """Extract relevant information from a webpage."""
@@ -134,12 +150,8 @@ class WebCrawler:
             links = self.get_links(response=response, url=url)
             
             # Return discovered links for further crawling if we're below max_depth
-            current_depth = self.url_depths.get(url, 0)
+            current_depth = self.get_depth(url)
             if current_depth < self.max_depth:
-                # Record depths for new URLs
-                for link in links:
-                    if link not in self.url_depths:
-                        self.url_depths[link] = current_depth + 1
                 return links
             
             return set()
@@ -164,7 +176,6 @@ class WebCrawler:
         
         # Queue-based crawling to prevent deadlocks
         to_crawl = deque([url])
-        self.url_depths[url] = depth
         
         while to_crawl and len(self.visited_urls) < self.max_pages:
             # Take a batch of URLs to process in parallel
@@ -202,11 +213,10 @@ class WebCrawler:
                     for new_url in new_urls:
                         with self.url_lock:
                             if new_url not in self.visited_urls and new_url not in self.in_progress_urls and len(self.visited_urls) < self.max_pages:
-                                current_depth = self.url_depths.get(current_url, 0)
-                                self.url_depths[new_url] = current_depth + 1
+                                current_depth = self.get_depth(current_url) + 1
                                 
                                 # Only add URLs that don't exceed max_depth
-                                if self.url_depths[new_url] <= self.max_depth:
+                                if current_depth <= self.max_depth:
                                     to_crawl.append(new_url)
                 except Exception as e:
                     # Make sure to remove URL from in_progress even if there's an error
