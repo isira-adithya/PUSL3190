@@ -67,7 +67,11 @@ class HTMLParser:
         forms = self.find_forms()
         for form in forms:
             form_processor = FormProcessor(form, self.url)
-            form_processor.process()
+            try:
+                form_processor.process()
+            except Exception as e:
+                print(f"Error processing form: {e}")
+                continue
             # every form's url in form_processor.form_data should be absolute
             form_processor.form_data['url'] = self.convert_to_absolute_url(form_processor.form_data['url'], self.url, self.url_schema)
             self.forms_data.append(form_processor.form_data)

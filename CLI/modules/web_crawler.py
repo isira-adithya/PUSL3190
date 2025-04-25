@@ -8,9 +8,10 @@ import validators
 from rich.progress import Progress, TaskID
 from typing import Optional, Set, Dict
 from modules.html_parser import HTMLParser
+from concurrent.futures import ThreadPoolExecutor
 
 class WebCrawler:
-    def __init__(self, base_url: str, max_depth: int = 2, max_pages: int = 100, should_crawl: bool = False, proxy: str = None, insecure: bool = False, headers: List[str] = [], cookies: str = None):
+    def __init__(self, base_url: str, max_depth: int = 2, max_pages: int = 100, should_crawl: bool = False, proxy: str = None, insecure: bool = False, headers: List[str] = [], cookies: str = None, thread_count: int = 5):
         self.base_url = base_url
         self.max_depth = max_depth
         self.max_pages = max_pages
@@ -21,6 +22,13 @@ class WebCrawler:
         self.tasks: Dict[str, TaskID] = {}
         self.identified_forms = []
         self.should_crawl = should_crawl
+
+        # Threading related stuff
+        self.thread_count = thread_count
+        self.executor = ThreadPoolExecutor(max_workers=self.thread_count)
+
+
+        # HTTP Session Related Stuff
         self.http_session = requests.Session()
         self.http_session.proxies.update({
             'http': proxy,
@@ -62,6 +70,7 @@ class WebCrawler:
         """Extract all links from a webpage."""
         try:
             response = self.http_session.get(url, timeout=10)
+            print(f"Got the response for {url}")
             response.raise_for_status()
             soup = BeautifulSoup(response.text, 'html.parser')
             links = set()
@@ -130,9 +139,23 @@ class WebCrawler:
             # get links and keep crawling
             links = self.get_links(url)
             if (self.should_crawl):
+                futures = []
+                print(f"Future Pool: {len(futures)}")
                 for link in links:
-                    self.crawl(link, depth + 1)
-                    
+                    # Check if self.executor has max_workers threads running
+                    if len(futures) >= self.thread_count:
+                        # Wait for the first future to complete
+                        completed_future = futures.pop(0)
+                        completed_future.result()
+                    # self.visited_urls.add(link)
+                    future = self.executor.submit(self.crawl, link, depth + 1)
+                    futures.append(future)
+
+                for future in futures:
+                    future.result()
+
+            return    
+            
         except Exception as e:
             self.console.print(f"[red]Error crawling {url}: {str(e)}[/red]")
             if self.progress and url in self.tasks:

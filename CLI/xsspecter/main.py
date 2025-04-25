@@ -35,7 +35,10 @@ def spray(
         [], help="Custom headers to include in requests (format: key1:value1). Use multiple times for multiple headers. (e.g. --headers key1:value1 --headers key2:value2)"
     ),
     cookies: str = typer.Option(
-        [], help="Cookies to include in requests (format: \"key1=value1;key2=value2;\")."
+        None, help="Cookies to include in requests (format: \"key1=value1;key2=value2;\")."
+    ),
+    threads: int = typer.Option(
+        5, help="Number of threads to use for payload spraying."
     ),
 ):
     """
@@ -58,7 +61,7 @@ def spray(
         console.print(f"Crawling: [red]Disabled[/red]")
     console.print(f"Output File: {output}")
     
-    crawler = WebCrawler(base_url=url, max_depth=depth, max_pages=max_pages, should_crawl=crawl, proxy=proxy, insecure=insecure, headers=headers, cookies=cookies)
+    crawler = WebCrawler(base_url=url, max_depth=depth, max_pages=max_pages, should_crawl=crawl, proxy=proxy, insecure=insecure, headers=headers, cookies=cookies, thread_count=threads)
     
     # Create a single progress instance for the entire crawling process
     progress = Progress(
