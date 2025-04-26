@@ -95,14 +95,13 @@ class WebCrawler:
 
         # get the path of the url
         path = parsed_url.path
-        
+
         # check if the path is empty
         if not path:
             return 0
         else:
             # split the path into parts
             parts = path.split('/')
-            print("URL Parts:", len(parts) - 1)
             return len(parts) - 1
     
     def extract_page_info(self, url: str, response: requests.Response) -> dict:
@@ -158,6 +157,7 @@ class WebCrawler:
             
         except Exception as e:
             self.console.print(f"[red]Error processing {url}: {str(e)}[/red]")
+            self.visited_urls.add(url)
             if self.progress and url in self.tasks:
                 self.progress.update(self.tasks[url], visible=False)
             return set()
