@@ -31,7 +31,7 @@ XSSpecter is a modular toolkit for managing and exploiting Blind Cross-Site Scri
 
 Contributions, issues, and pull requests are welcome! Please refer to the respective component README files for contribution guidelines and licensing:
 
-- [Server README](server/README..md)
+- [Server README](server/README.md)
 - [CLI README](cli/README.md)
 
 ## License
