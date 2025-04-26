@@ -1,4 +1,3 @@
-<!--- This documentation covers the XSSpecter Server callback handling and dashboard --->
 # XSSpecter Server - Callback Handling & Dashboard
 
 XSSpecter Server receives blind-XSS callbacks from client payloads, persists detailed alert data, and provides a web dashboard for monitoring, analysis, and notifications.
@@ -131,6 +130,3 @@ _Use `docker-compose.dev.yaml` for development with hot-reloading._
 - Contributions: fork repo, create a branch, open a pull request.
 - Code style: ESLint & Prettier enforced for consistency.
 - **License:** No default license included; consider adding an open-source license (e.g., MIT) before public use.
-
----
-_End of XSSPecter Server documentation_

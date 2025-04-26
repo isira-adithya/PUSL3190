@@ -1,4 +1,3 @@
-<!--- This documentation provides a detailed, LLM-ready overview of the XSSpecter codebase --->
 # XSSpecter - XSS Payload Spraying CLI Tool
 
 XSSpecter is a command-line interface (CLI) utility designed for penetration testers to ethically **spray** various Cross-Site Scripting (XSS) payloads across web targets. It automates crawling, form and link extraction, payload generation, injection via GET/POST (including multipart), and results export.
@@ -165,6 +164,3 @@ xsspecter [OPTIONS] <url>
 - Contributions via Issues & PRs welcome.
 - Fork the repo, create a branch, submit a pull request.
 - **License**: No license file included by default; consider adding MIT or Apache-2.0 before production use.
-
----
-_End of LLM-ready XSSpecter documentation_
