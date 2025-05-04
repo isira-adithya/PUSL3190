@@ -9,7 +9,7 @@ async function checkAuth(req, res, next) {
   }
 
   // Check if req.path starts with /api/cli/
-  if (req.path.toLowerCase().startsWith('/cli/')) {
+  if (req.path.toLowerCase().contains('/cli/')) {
 
     // Check if Authorization header is present
     if (req.headers.authorization) {
