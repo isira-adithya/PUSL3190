@@ -88,6 +88,59 @@ After installation, verify that all services are running properly by checking th
 docker ps
 ```
 
+## Configuration
+
+1. **Access the Application**
+
+   Open your web browser and navigate to:
+
+   ```plaintext
+   http://<SERVER_IP>:80/app/
+   ```
+
+2. **Log In**
+
+   Sign in to the admin panel using the default credentials:
+
+   * **Username**: `admin`
+   * **Password**: The password you provided or generated during the setup process (`setup.sh`/`setup.bat`).
+
+3. **Open Settings**
+
+   Go to the settings page:
+
+   ```plaintext
+   http://<SERVER_IP>:80/app/settings
+   ```
+
+4. **Configure Notifications**
+
+   Update each of the following notification options as needed:
+
+   * **Email Notifications**:
+     * SMTP Host
+     * SMTP Port
+     * SMTP Username
+     * SMTP Password
+     * From Email Address
+
+   * **Discord Notifications**:
+     * Discord Webhook URL
+
+   * **Slack Notifications**:
+     * Slack Webhook URL
+
+   * **Telegram Notifications**:
+     * Bot Token
+     * Chat ID
+
+5. **Advanced Settings**
+   * **IP Header**: If your server is hosted behind a reverse proxy (for example, Cloudflare), enter `CF-Connecting-IP` here. This ensures that blind XSS callbacks report the client’s original IP address rather than the proxy’s IP.
+
+6. **AI Settings**
+   * **OpenAI API Key**: Enter your OpenAI API key to enable automatic report generation.
+
+
 ## Troubleshooting
 
 If you encounter any issues during installation:

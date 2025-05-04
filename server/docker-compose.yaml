@@ -31,7 +31,7 @@ services:
       - "80:80"
 
   db:
-    image: postgres:latest
+    image: postgres:17
     environment:
       POSTGRES_USER: xsspecter
       POSTGRES_PASSWORD_FILE: /run/secrets/db_password
