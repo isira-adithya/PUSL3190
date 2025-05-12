@@ -45,7 +45,7 @@ services:
     restart: always
 
   db:
-    image: postgres:latest
+    image: postgres:17
     ports:
       - "5432:5432"
     environment:

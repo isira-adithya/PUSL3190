@@ -1,156 +1,42 @@
 [
   {
-    "url": "https://demo.cyotek.com/",
-    "title": "HTTP Crawler Test Site",
+    "url": "https://vulnerable-support-tickets.vulnx.cc/",
+    "title": "Support Ticket System",
     "meta_description": "No description",
     "headers": [
-      "Welcome"
+      "Support Ticket System"
     ],
     "status_code": 200,
-    "crawled_at": "2025-04-25T17:19:25.123401"
+    "crawled_at": "2025-05-12T02:54:39.454102"
   },
   {
-    "url": "https://demo.cyotek.com/statuscodes/index.php",
-    "title": "HTTP Status Codes • HTTP Crawler Test Site",
+    "url": "https://vulnerable-support-tickets.vulnx.cc/admin/index.php",
+    "title": "Support Ticket System",
     "meta_description": "No description",
     "headers": [
-      "HTTP Status Codes",
-      "3xx Redirection",
-      "4xx Client Error",
-      "5xx Server Error"
+      "Admin Login"
     ],
     "status_code": 200,
-    "crawled_at": "2025-04-25T17:19:27.554512"
+    "crawled_at": "2025-05-12T02:54:39.587494"
   },
   {
-    "url": "https://demo.cyotek.com/javascript/index.php",
-    "title": "JavaScript • HTTP Crawler Test Site",
+    "url": "https://vulnerable-support-tickets.vulnx.cc/view-ticket.php",
+    "title": "Support Ticket System",
     "meta_description": "No description",
     "headers": [
-      "JavaScript"
+      "Check Ticket Status"
     ],
     "status_code": 200,
-    "crawled_at": "2025-04-25T17:19:27.710836"
+    "crawled_at": "2025-05-12T02:54:39.713463"
   },
   {
-    "url": "https://demo.cyotek.com/features/index.php",
-    "title": "Features • HTTP Crawler Test Site",
+    "url": "https://vulnerable-support-tickets.vulnx.cc/create-ticket.php",
+    "title": "Support Ticket System",
     "meta_description": "No description",
     "headers": [
-      "Features"
+      "Create Support Ticket"
     ],
     "status_code": 200,
-    "crawled_at": "2025-04-25T17:19:30.104071"
-  },
-  {
-    "url": "https://demo.cyotek.com/changelog.php",
-    "title": "Change Log • HTTP Crawler Test Site",
-    "meta_description": "No description",
-    "headers": [
-      "Change Log",
-      "1.30.0",
-      "1.29.3",
-      "1.29.2",
-      "1.29.1",
-      "1.29.0",
-      "1.28.1",
-      "1.28.0",
-      "1.27.0",
-      "1.26.0",
-      "1.25.2",
-      "1.25.1",
-      "1.25.0",
-      "1.24.1",
-      "1.24.0",
-      "1.23.0",
-      "1.22.2",
-      "1.22.1",
-      "1.22.0",
-      "1.21.0",
-      "1.20.0",
-      "1.19.0",
-      "1.18.0",
-      "1.17.1",
-      "1.17.0",
-      "1.16.1",
-      "1.16.0",
-      "1.15.0",
-      "1.14.0",
-      "1.13.0",
-      "1.12.0",
-      "1.11.0",
-      "1.10.0",
-      "1.9.0",
-      "1.8.0",
-      "1.7.0",
-      "1.6.0",
-      "1.5.1",
-      "1.5.0",
-      "1.4.0",
-      "1.3.0",
-      "1.2.2",
-      "1.2.1",
-      "1.2.0",
-      "1.1.0",
-      "1.0.0"
-    ],
-    "status_code": 200,
-    "crawled_at": "2025-04-25T17:19:30.118206"
-  },
-  {
-    "url": "https://demo.cyotek.com/css/index.php",
-    "title": "CSS • HTTP Crawler Test Site",
-    "meta_description": "No description",
-    "headers": [
-      "CSS"
-    ],
-    "status_code": 200,
-    "crawled_at": "2025-04-25T17:19:32.641693"
-  },
-  {
-    "url": "https://demo.cyotek.com/about.php",
-    "title": "About • HTTP Crawler Test Site",
-    "meta_description": "No description",
-    "headers": [
-      "About",
-      "HTTP Crawler Test Site",
-      "Acknowledgements",
-      "Source Code",
-      "License"
-    ],
-    "status_code": 200,
-    "crawled_at": "2025-04-25T17:19:35.018049"
-  },
-  {
-    "url": "https://demo.cyotek.com/html/index.php",
-    "title": "HTML Tags and Attributes • HTTP Crawler Test Site",
-    "meta_description": "No description",
-    "headers": [
-      "HTML Tags and Attributes",
-      "Elements",
-      "Attributes"
-    ],
-    "status_code": 200,
-    "crawled_at": "2025-04-25T17:19:35.041278"
-  },
-  {
-    "url": "https://demo.cyotek.com",
-    "title": "HTTP Crawler Test Site",
-    "meta_description": "No description",
-    "headers": [
-      "Welcome"
-    ],
-    "status_code": 200,
-    "crawled_at": "2025-04-25T17:19:39.592226"
-  },
-  {
-    "url": "https://demo.cyotek.com/license.php",
-    "title": "License • HTTP Crawler Test Site",
-    "meta_description": "No description",
-    "headers": [
-      "License"
-    ],
-    "status_code": 200,
-    "crawled_at": "2025-04-25T17:19:39.610975"
+    "crawled_at": "2025-05-12T02:54:39.775248"
   }
 ]

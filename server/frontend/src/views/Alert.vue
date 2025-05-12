@@ -21,7 +21,8 @@
             <div class="text-gray-500">{{ formatDate(alert.timestamp) }}</div>
           </div>
           <div>
-            <Button v-if="alert['Report'] == null" severity="info" label="Generate Report" :loading="reportGenerationBusy" icon="pi pi-bolt" class="mr-5" @click="generateReport(false)" />
+            <Button v-if="alert['Report'] == null" severity="info" label="Generate Report"
+              :loading="reportGenerationBusy" icon="pi pi-bolt" class="mr-5" @click="generateReport(false)" />
             <Button label="Back to List" icon="pi pi-arrow-left" @click="goBack" />
           </div>
         </div>
@@ -84,18 +85,6 @@
                       :severity="alert.isInIframe ? 'warning' : 'info'" />
                   </div>
                 </div>
-
-                <h3 class="text-lg font-medium mb-3">Time Information</h3>
-                <div class="p-4 rounded-lg">
-                  <div class="mb-2">
-                    <span class="font-medium text-gray-700 dark:text-gray-400">Current Time:</span>
-                    <div class="text-sm mt-1">{{ alert.currentTime }}</div>
-                  </div>
-                  <div class="mb-2">
-                    <span class="font-medium text-gray-700 dark:text-gray-400">Timezone:</span>
-                    <div class="text-sm mt-1">{{ alert.timezone }} ({{ alert.timezoneName }})</div>
-                  </div>
-                </div>
               </div>
 
               <div>
@@ -121,6 +110,50 @@
                   </div>
                 </div>
               </div>
+
+              <div>
+                <h3 class="text-lg font-medium mb-3">Cookies</h3>
+                <div class="p-4 rounded-lg mb-4">
+                  <div class="mb-6">
+                    <span class="font-medium text-gray-700 dark:text-gray-400">Raw Cookies</span>
+                    <div class="text-sm mt-1"><code>{{ alert.cookies }}</code></div>
+                  </div>
+                  <div class="mb-2">
+                    <span class="font-medium text-gray-700 dark:text-gray-400">Parsed:</span>
+                    <div class="text-sm mt-1">
+                      <div class="border rounded max-h-24 overflow-y-auto">
+                      <table class="min-w-full">
+                        <tbody>
+                        <tr v-for="(value, key) in alert.cookiesObj" :key="key" 
+                          class="border-b last:border-b-0 hover:bg-gray-50 dark:hover:bg-gray-800">
+                          <td class="py-2 px-3 font-medium">{{ key }}:</td>
+                          <td class="py-2 px-3 text-green-700 dark:text-green-300 break-all">{{ value }}</td>
+                        </tr>
+                        </tbody>
+                      </table>
+                      </div>
+                      <div class="text-xs text-gray-500 mt-1 italic" v-if="Object.keys(alert.cookiesObj).length > 3">
+                      Scroll to see all cookies
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div>
+
+                <h3 class="text-lg font-medium mb-3">Time Information</h3>
+                <div class="p-4 rounded-lg mb-4">
+                  <div class="mb-2">
+                    <span class="font-medium text-gray-700 dark:text-gray-400">Current Time:</span>
+                    <div class="text-sm mt-1">{{ alert.currentTime }}</div>
+                  </div>
+                  <div class="mb-2">
+                    <span class="font-medium text-gray-700 dark:text-gray-400">Timezone:</span>
+                    <div class="text-sm mt-1">{{ alert.timezone }} ({{ alert.timezoneName }})</div>
+                  </div>
+                </div>
+              </div>
+
 
               <!-- Screenshot -->
               <div v-if="alert.containsScreenshot" class="col-span-2">
@@ -332,7 +365,8 @@
             <div class="p-4 rounded-lg overflow-auto flex-grow">
               <div class="space-y-4">
                 <div class="flex justify-end mb-2">
-                  <Button severity="info" label="Regenerate Report" :loading="reportGenerationBusy" icon="pi pi-bolt" class="mr-5" @click="generateReport(true)" />
+                  <Button severity="info" label="Regenerate Report" :loading="reportGenerationBusy" icon="pi pi-bolt"
+                    class="mr-5" @click="generateReport(true)" />
                   <Button label="Copy Source" icon="pi pi-copy" class="p-button-sm"
                     @click="copyToClipboard(alert['Report']['description'])" />
                 </div>
@@ -385,66 +419,66 @@ const copyToClipboard = (text) => {
 };
 
 // generate ai report
-const generateReport = async (force=false) => {
+const generateReport = async (force = false) => {
   confirm.require({
-        message: 'Proceeding may use AI credits. Would you like to continue?',
-        header: 'Confirmation',
-        icon: 'pi pi-info-circle',
-        rejectProps: {
-            label: 'Cancel',
-            severity: 'secondary',
-            outlined: true
-        },
-        acceptProps: {
-            label: 'Confirm'
-        },
-        accept: async () => {
-            reportGenerationBusy.value = true;
-            try {
-                const alertId = route.params.id;
-                const response = await fetch(`/api/alerts/${alertId}/report${force ? '?force=true' : ''}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
+    message: 'Proceeding may use AI credits. Would you like to continue?',
+    header: 'Confirmation',
+    icon: 'pi pi-info-circle',
+    rejectProps: {
+      label: 'Cancel',
+      severity: 'secondary',
+      outlined: true
+    },
+    acceptProps: {
+      label: 'Confirm'
+    },
+    accept: async () => {
+      reportGenerationBusy.value = true;
+      try {
+        const alertId = route.params.id;
+        const response = await fetch(`/api/alerts/${alertId}/report${force ? '?force=true' : ''}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
 
-                if (response.status == 400){
-                  const jObj = await response.json();
-                  throw new Error(jObj['message'])
-                }
-
-                if (!response.ok) {
-                    throw new Error('Failed to generate report');
-                }
-
-                const data = await response.json();
-                alert.value['Report'] = data['report'];
-                parseMarkdown();
-            } catch (err) {
-                console.error('Error generating report:', err);
-                toast.add({
-                    severity: 'error',
-                    summary: 'Error',
-                    detail: err.message || 'Failed to generate report',
-                    life: 3000
-                });
-            } finally {
-                reportGenerationBusy.value = false;
-            }
-        },
-        reject: () => {
-            
+        if (response.status == 400) {
+          const jObj = await response.json();
+          throw new Error(jObj['message'])
         }
-    });
+
+        if (!response.ok) {
+          throw new Error('Failed to generate report');
+        }
+
+        const data = await response.json();
+        alert.value['Report'] = data['report'];
+        parseMarkdown();
+      } catch (err) {
+        console.error('Error generating report:', err);
+        toast.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: err.message || 'Failed to generate report',
+          life: 3000
+        });
+      } finally {
+        reportGenerationBusy.value = false;
+      }
+    },
+    reject: () => {
+
+    }
+  });
 }
 
 // parse markdown
 const parseMarkdown = () => {
   if (alert.value['DocumentSource']) {
-      documentSourceParsed.value = marked.parse(`\`\`\`html\n${alert.value['DocumentSource']['document']}\n\`\`\``);
-      const bgColor = '#18181b';
-      documentSourceParsed.value = `
+    documentSourceParsed.value = marked.parse(`\`\`\`html\n${alert.value['DocumentSource']['document']}\n\`\`\``);
+    const bgColor = '#18181b';
+    documentSourceParsed.value = `
         <html>
         <head>
         <script src="/app/assets/js/highlightjs/highlight.min.js"><\/script>
@@ -455,12 +489,12 @@ const parseMarkdown = () => {
         <script>hljs.highlightAll();<\/script>
         </body>
         `
-    }
+  }
 
-    if (alert.value['Report']){
-      reportSourceParsed.value = marked.parse(alert.value['Report']['description']);
-      const bgColor = '#18181b';
-      reportSourceParsed.value = `
+  if (alert.value['Report']) {
+    reportSourceParsed.value = marked.parse(alert.value['Report']['description']);
+    const bgColor = '#18181b';
+    reportSourceParsed.value = `
         <html>
         <head>
         <script src="/app/assets/js/highlightjs/highlight.min.js"><\/script>
@@ -487,7 +521,7 @@ const parseMarkdown = () => {
         <script>hljs.highlightAll();<\/script>
         </body>
         `
-    }
+  }
 }
 
 // Fetch alert details
@@ -505,6 +539,11 @@ const fetchAlertDetails = async () => {
     }
 
     alert.value = await response.json();
+    alert.value['cookiesObj'] = alert.value['cookies'].split('; ').reduce((acc, cookie) => {
+      const [key, value] = cookie.split('=');
+      acc[key] = value;
+      return acc;
+    }, {});
     parseMarkdown();
   } catch (err) {
     console.error('Error fetching alert details:', err);
