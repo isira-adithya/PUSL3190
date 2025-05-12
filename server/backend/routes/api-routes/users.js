@@ -5,6 +5,8 @@ import crypto from "crypto";
 import * as argon2 from "argon2";
 const router = express.Router();
 const prisma = new PrismaClient();
+import rateLimit from "express-rate-limit";
+import getCorrectIp from "../../helpers/get-correct-ip.js";
 
 // admin priv check middleware
 const adminCheck = (req, res, next) => {
@@ -15,7 +17,16 @@ const adminCheck = (req, res, next) => {
     next();
 }
 
-router.post("/login", 
+const loginLimiter = rateLimit({
+    windowMs: 1 * 60 * 1000, // 1 minute
+    max: 10, // Limit each IP to 5 requests per windowMs
+    message: "Too many login attempts, please try again later.",
+    keyGenerator: async (req) => {
+        return await getCorrectIp(req);
+    },
+});
+
+router.post("/login", loginLimiter, 
     body("username").isString().notEmpty().withMessage("Username is required"),
     body("password").isString().notEmpty().withMessage("Password is required"),
     async (req, res) => {

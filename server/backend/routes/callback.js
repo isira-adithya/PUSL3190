@@ -3,6 +3,16 @@ const router = express.Router();
 import sendNotifications from "../helpers/send-notifications.js";
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
+import ratelimit from "express-rate-limit";
+import getCorrectIp from "../helpers/get-correct-ip.js";
+
+const limiter = ratelimit({
+    windowMs: 1 * 60 * 1000, // 1 minute
+    max: 20, // Limit each IP to 100 requests per windowMs
+    keyGenerator: async (req) => {
+        return await getCorrectIp(req);
+    },
+});
 
 router.options('/', (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -11,28 +21,14 @@ router.options('/', (req, res) => {
     res.status(200).send();
 });
 
-router.post('/', async (req, res) => {
+router.post('/', limiter, async (req, res) => {
     // Set CORS headers
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
     // Getting the correct IP
-    var correctIp = req.ip;
-    const customHeader = await prisma.settings.findFirst({
-        where: {
-            key: "ip_header"
-        }
-    })
-    if (customHeader) {
-        const ipHeader = customHeader.value.toLowerCase();
-        console.log(ipHeader)
-        console.log(req.headers)
-        if (ipHeader) {
-            correctIp = req.headers[ipHeader] || req.ip;
-        }
-    }
-    res.setHeader('X-Detected-IP', correctIp);
+    var correctIp = await getCorrectIp(req);
 
     try {
         var trackingId = null;
