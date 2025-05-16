@@ -36,8 +36,8 @@ class FormProcessor:
                 options = select.find_all('option')
                 selected_value = ''
                 for option in options:
-                    if option.get('selected'):
-                        selected_value = option.get('value')
+                    if option.has_attr('selected'):
+                        selected_value = option.get('value', '')
                 form_data[name] = {
                     'value': selected_value,
                     'type': 'select'
