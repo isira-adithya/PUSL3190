@@ -27,14 +27,18 @@ class Config:
 
         if not os.path.exists(config_file):
             # Create the config directory and file if they don't exist
-            os.makedirs(os.path.dirname(config_file), exist_ok=True)
-            with open(config_file, 'w') as f:
-                json.dump({
-                    "domain": self.domain,
-                    "api_key": "",
-                    "max_depth": self.max_depth,
-                    "rate_limit": self.rate_limit
-                }, f, indent=4)
+            try:
+                os.makedirs(os.path.dirname(config_file), exist_ok=True)
+                with open(config_file, 'w') as f:
+                    json.dump({
+                        "domain": self.domain,
+                        "api_key": "",
+                        "max_depth": self.max_depth,
+                        "rate_limit": self.rate_limit
+                    }, f, indent=4)
+            except Exception:
+                # Ignore errors (e.g., permission issues)
+                pass
             return
         
         with open(config_file, 'r') as f:

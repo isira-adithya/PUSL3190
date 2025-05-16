@@ -42,18 +42,18 @@ class PayloadSpray:
         config = Config()
 
         query_dict = {}
-        for key in data:
-            # Ignore keys with csrf_token, session_id, cookie, token, etc.
-            if key.lower() in config.IGNORE_KEYS:
-                query_dict[key] = data[key]["value"]
+        for key, info in data.items():
+            # Ignore keys based on input type (e.g., csrf_token, session_id, cookie, token, etc.)
+            if info.get('type') in config.IGNORE_KEYS:
+                query_dict[key] = info.get("value")
             # Check if the key type is a specific one, if so use suitable values
-            elif (data[key].get('type') == 'email'):
+            elif info.get('type') == 'email':
                 query_dict[key] = config.DEFAULT_EMAIL
-            elif (data[key].get('type') == 'url'):
+            elif info.get('type') == 'url':
                 query_dict[key] = config.DEFAULT_NUMBER
-            elif (data[key].get('type') == 'number'):
+            elif info.get('type') == 'number':
                 query_dict[key] = config.DEFAULT_NUMBER
-            elif (data[key].get('type') == 'tel'):
+            elif info.get('type') == 'tel':
                 query_dict[key] = config.DEFAULT_PHONE
             else:
                 query_dict[key] = self.payload
