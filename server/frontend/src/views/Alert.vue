@@ -492,7 +492,13 @@ const parseMarkdown = () => {
   }
 
   if (alert.value['Report']) {
-    reportSourceParsed.value = marked.parse(alert.value['Report']['description']);
+    // Replace {IMAGE_PLACERHOLDER} with markdown image
+    const markPrep = alert.value['Report']['description'].replace(
+      '{IMAGE_PLACERHOLDER}',
+      `  \n![Screenshot](/api/alerts/${alert.value.id}/screenshot)`
+    );
+    console.log(markPrep);
+    reportSourceParsed.value = marked.parse(markPrep);
     const bgColor = '#18181b';
     reportSourceParsed.value = `
         <html>
