@@ -84,6 +84,9 @@ name=PAYLOAD&description=PAYLOAD
 
 Upon admin review in \`[VULNERABLE_ENDPOINT]\`, the script executed in the admin’s browser, confirming the blind XSS.
 
+Screenshot of the page showing the executed script:
+{IMAGE_PLACERHOLDER} 
+
 ---
 
 ### **Mitigation Recommendations**
@@ -154,7 +157,7 @@ async function generateReport(xssAlertId){
         input: [
             {
                 "role": "developer",
-                "content": `Generate a detailed vulnerability report from user input based the following report example.\n\n${exampleReport}\n\nThe report should be in markdown format and include the following information:\n- Vulnerability Type\n- Injection Point\n- Trigger Point\n- Impact\n- Severity\n- Proof of Concept\n- Mitigation Recommendations\n- Conclusion\n\nOutput should be in JSON. Ex: {"report": "## XSS Report ..etc"}`
+                "content": `Generate a detailed vulnerability report from user input based the following report example.\n\n${exampleReport}\n\nThe report should be in markdown format and include the following information:\n- Vulnerability Type\n- Injection Point\n- Trigger Point\n- Impact\n- Severity\n- Proof of Concept\n- Mitigation Recommendations\n- Conclusion\nInclude '{IMAGE_PLACERHOLDER}' in the markdown to attach the screenshot later.\n\nOutput should be in JSON. Ex: {"report": "## XSS Report ..etc"}`
             },
             {
                 "role": "user",
