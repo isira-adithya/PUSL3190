@@ -1,7 +1,7 @@
 import typer
 from typing import List
 from rich.console import Console
-from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TaskID
+from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn
 import validators
 from pathlib import Path
 from modules.web_crawler import WebCrawler
@@ -83,7 +83,7 @@ def spray(
     
     # spray payloads
     for target in identified_forms:
-        payloads = payload_generator.get_payloads(target)
+        unique_id, payloads = payload_generator.get_payloads(target)
         for payload in payloads:
             payloadSprayObj = PayloadSpray(payload=payload, target=target, http_session=crawler.http_session)
             result = payloadSprayObj.run()
@@ -91,7 +91,14 @@ def spray(
                 console.print(f"[red]Payload [blue]{payload}[/blue] sent to [blue]{target['url']}[/blue] - Status {result.status_code}[/red]")
             else:
                 console.print(f"[green]Payload [blue]{payload}[/blue] sent to [blue]{target['url']}[/blue] - Status {result.status_code}[/green]")
-    
+            # Add result to crawler results
+            crawler.results.append({
+                'target': target['url'],
+                'payload': payload,
+                'status_code': result.status_code,
+                'response': result.text
+            })
+
     # Export results
     ResultExporter.export_json(crawler.results, output)
     console.print(f"[green]Results exported to {output}[/green]")

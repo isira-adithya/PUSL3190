@@ -9,6 +9,6 @@ def test_get_payloads(monkeypatch):
     pg = pg_mod.PayloadGenerator()
     pg.config.domain = "test.com"
     pg.config.api_key = "key"
-    target = {"url": "http://example.com", "method": "GET", "data": {}}
-    payloads = pg.get_payloads(target)
+    target = {"url": "http://example.com", "method": "GET", "data": {"x": {"value": "1", "type": "text"}, "y": {"value": "2", "type": "text"}}}
+    uniqueid, payloads = pg.get_payloads(target)
     assert len(payloads) == 3

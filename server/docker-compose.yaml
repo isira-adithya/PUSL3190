@@ -24,6 +24,7 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - db
+      - backend
     networks:
       - app-network
     restart: always
