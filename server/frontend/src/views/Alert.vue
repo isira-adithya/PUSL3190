@@ -366,10 +366,10 @@
               <div class="space-y-4">
                 <div class="flex justify-end mb-2">
                   <Button severity="info" label="Regenerate Report" :loading="reportGenerationBusy" icon="pi pi-bolt"
-                    class="mr-5" @click="generateReport(true)" />
-                  <Button label="Copy Source" icon="pi pi-copy" class="p-button-sm"
+                    class="mr-2" @click="generateReport(true)" />
+                  <Button label="Copy Source" icon="pi pi-copy" class="p-button-sm mr-2"
                     @click="copyToClipboard(alert['Report']['description'])" />
-                  <Button severity="success" label="Download PDF" icon="pi pi-file-pdf" class="mr-5"
+                  <Button severity="success" label="Download PDF" icon="pi pi-file-pdf" class=""
                     @click="generatePDF" />
                 </div>
                 <iframe id="report-iframe" :srcdoc="reportSourceParsed" style="width: 100%; height: 80vh;"></iframe>
