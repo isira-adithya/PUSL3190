@@ -497,7 +497,6 @@ const parseMarkdown = () => {
       '{IMAGE_PLACERHOLDER}',
       `  \n![Screenshot](/api/alerts/${alert.value.id}/screenshot)`
     );
-    console.log(markPrep);
     reportSourceParsed.value = marked.parse(markPrep);
     const bgColor = '#18181b';
     reportSourceParsed.value = `
