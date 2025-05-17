@@ -122,18 +122,18 @@
                     <span class="font-medium text-gray-700 dark:text-gray-400">Parsed:</span>
                     <div class="text-sm mt-1">
                       <div class="border rounded max-h-24 overflow-y-auto">
-                      <table class="min-w-full">
-                        <tbody>
-                        <tr v-for="(value, key) in alert.cookiesObj" :key="key" 
-                          class="border-b last:border-b-0 hover:bg-gray-50 dark:hover:bg-gray-800">
-                          <td class="py-2 px-3 font-medium">{{ key }}:</td>
-                          <td class="py-2 px-3 text-green-700 dark:text-green-300 break-all">{{ value }}</td>
-                        </tr>
-                        </tbody>
-                      </table>
+                        <table class="min-w-full">
+                          <tbody>
+                            <tr v-for="(value, key) in alert.cookiesObj" :key="key"
+                              class="border-b last:border-b-0 hover:bg-gray-50 dark:hover:bg-gray-800">
+                              <td class="py-2 px-3 font-medium">{{ key }}:</td>
+                              <td class="py-2 px-3 text-green-700 dark:text-green-300 break-all">{{ value }}</td>
+                            </tr>
+                          </tbody>
+                        </table>
                       </div>
                       <div class="text-xs text-gray-500 mt-1 italic" v-if="Object.keys(alert.cookiesObj).length > 3">
-                      Scroll to see all cookies
+                        Scroll to see all cookies
                       </div>
                     </div>
                   </div>
@@ -366,11 +366,13 @@
               <div class="space-y-4">
                 <div class="flex justify-end mb-2">
                   <Button severity="info" label="Regenerate Report" :loading="reportGenerationBusy" icon="pi pi-bolt"
-                    class="mr-5" @click="generateReport(true)" />
-                  <Button label="Copy Source" icon="pi pi-copy" class="p-button-sm"
+                    class="mr-2" @click="generateReport(true)" />
+                  <Button label="Copy Source" icon="pi pi-copy" class="p-button-sm mr-2"
                     @click="copyToClipboard(alert['Report']['description'])" />
+                  <Button severity="success" label="Download PDF" icon="pi pi-file-pdf" class=""
+                    @click="generatePDF" />
                 </div>
-                <iframe :srcdoc="reportSourceParsed" style="width: 100%; height: 80vh;"></iframe>
+                <iframe id="report-iframe" :srcdoc="reportSourceParsed" style="width: 100%; height: 80vh;"></iframe>
               </div>
             </div>
           </TabPanel>
@@ -386,6 +388,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { useConfirm } from 'primevue';
 import { useToast } from "primevue/usetoast";
 import { marked } from 'marked';
+
 
 // primevue functions
 const toast = useToast();
@@ -416,6 +419,49 @@ const goBack = () => {
 
 const copyToClipboard = (text) => {
   navigator.clipboard.writeText(text);
+};
+
+// Generate PDF from iframe content
+const generatePDF = () => {
+
+  var script = document.createElement('script');
+  script.type = 'application/javascript';
+  script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+  document.head.appendChild(script);
+  script.onload = () => {
+    const iframe = document.querySelector('#report-iframe');
+    const content = iframe.contentDocument.documentElement.outerHTML;
+
+    // Create a temporary container with the iframe content
+    const container = document.createElement('div');
+    container.innerHTML = content.replace('class="markdown-body"', 'style="color: black; background-color: white;"');
+    const pdfStyles = `<style>
+    h1, h2, h3, h4, h5, h6 {
+      color: #1f2937; /* Dark gray */
+    }
+    </style>`;
+    container.innerHTML = container.innerHTML.replace('<!-- REPLACE-WITH-STYLES -->', pdfStyles);
+    // Change img size to fit PDF
+    const images = container.querySelectorAll('img');
+    images.forEach(img => {
+      img.style.maxWidth = '600px';
+      img.style.height = '1000px';
+    });
+    console.log(container.innerHTML)
+
+    // Configure pdf options
+    const options = {
+      margin: 10,
+      filename: `alert-report-${alert.value.id}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    html2pdf().from(container).set(options).save();
+  };
+
+
 };
 
 // generate ai report
@@ -497,7 +543,6 @@ const parseMarkdown = () => {
       '{IMAGE_PLACERHOLDER}',
       `  \n![Screenshot](/api/alerts/${alert.value.id}/screenshot)`
     );
-    console.log(markPrep);
     reportSourceParsed.value = marked.parse(markPrep);
     const bgColor = '#18181b';
     reportSourceParsed.value = `
@@ -521,9 +566,12 @@ const parseMarkdown = () => {
           color: #34d399;
         }
         </style>
+        <!-- REPLACE-WITH-STYLES -->
         </head>
         <body style='background-color: ${bgColor}; color: white; padding: 1rem;'>
-        ${reportSourceParsed.value}
+          <div class="markdown-body">
+            ${reportSourceParsed.value}
+          </div>
         <script>hljs.highlightAll();<\/script>
         </body>
         `
