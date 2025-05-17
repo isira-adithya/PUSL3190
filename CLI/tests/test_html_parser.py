@@ -22,7 +22,7 @@ def test_find_forms_and_links():
     assert len(forms) == 1
     success = hp.find_links()
     assert success
-    assert any(item["method"] == "GET" and item["data"] == {"x": "1", "y": "2"} for item in hp.forms_data)
+    assert any(item["method"] == "GET" and item["data"] == {"x": {"value": "1", "type": "text"}, "y": {"value": "2", "type": "text"}} for item in hp.forms_data)
 
 def test_extract_forms():
     html = '''
