@@ -4,7 +4,6 @@ import router from '@/router';
 
 import AlertsStatsWidget from '@/components/dashboard/AlertsStatsWidget.vue';
 import AlertTrendWidget from '@/components/dashboard/AlertTrendWidget.vue';
-import DomainDistributionWidget from '@/components/dashboard/DomainDistributionWidget.vue';
 import RecentAlertsWidget from '@/components/dashboard/RecentAlertsWidget.vue';
 import XSSPayloadsWidget from '@/components/dashboard/XSSPayloads.vue';
 
@@ -37,9 +36,6 @@ onMounted(() => {
         <div class="col-span-12 xl:col-span-6">
             <AlertTrendWidget :time-based-analytics="statistics['timeBasedAnalytics']"/>
             <RecentAlertsWidget :recent-alerts="statistics['detailedLists']['recentAlerts']" />
-            <!-- <div class="mt-8"> -->
-                <!-- <DomainDistributionWidget :domain-distribution="statistics['timeBasedAnalytics']['domainDistribution']" :user-agent-distribution="statistics['timeBasedAnalytics']['userAgentDistribution']" /> -->
-            <!-- </div> -->
         </div>
         <div class="col-span-12 xl:col-span-6">
             <XSSPayloadsWidget />
