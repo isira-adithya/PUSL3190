@@ -120,7 +120,6 @@ router.get('/:id/screenshot', async (req, res) => {
         } 
 
         res.setHeader('Content-Type', 'image/png');
-        res.setHeader('Content-Disposition', 'attachment; filename=' + alert.Screenshot.name);
         res.status(200).write(alert.Screenshot.data);
         res.end()
 
