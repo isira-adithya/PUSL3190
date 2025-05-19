@@ -27,6 +27,19 @@ XSSpecter is a modular toolkit for managing and exploiting Blind Cross-Site Scri
 └── server/   # Backend and frontend for callback handling and dashboard
 ```
 
+## Screenshots
+1. CLI - Help
+![xsspecter --help](./assets/images/cli-help.png)
+
+2. Server - Dashboard
+![xsspecter-server dashboard](./assets/images/server-dashboard.png)
+
+3. Server - Alert View
+![xsspecter-server view](./assets/images/server-alert.png)
+
+4. Server - Admin Settings
+![xssspecter-server admin-settings](./assets/images/server-settings.png)
+
 ## Contributing
 
 Contributions, issues, and pull requests are welcome! Please refer to the respective component README files for contribution guidelines and licensing:
