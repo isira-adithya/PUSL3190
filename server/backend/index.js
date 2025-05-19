@@ -22,10 +22,10 @@ const server = express();
 server.use(express.json({limit:'10mb'}));
 
 // debug
-server.use((req, res, next) => {
-    console.log(req.ip)
-    next();
-})
+// server.use((req, res, next) => {
+//     console.log(req.ip)
+//     next();
+// })
 
 // Routes
 server.use("/api", apiRouter);

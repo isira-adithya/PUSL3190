@@ -15,7 +15,6 @@ services:
       - express_session_secret
       - db_password
       - admin_password
-
     restart: always
 
   frontend:
