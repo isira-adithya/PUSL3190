@@ -428,7 +428,7 @@ const generatePDF = () => {
   script.type = 'application/javascript';
   script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
   document.head.appendChild(script);
-  script.onload = () => {
+  script.onload = async () => {
     const iframe = document.querySelector('#report-iframe');
     const content = iframe.contentDocument.documentElement.outerHTML;
 
@@ -443,19 +443,39 @@ const generatePDF = () => {
     container.innerHTML = container.innerHTML.replace('<!-- REPLACE-WITH-STYLES -->', pdfStyles);
     // Change img size to fit PDF
     const images = container.querySelectorAll('img');
-    images.forEach(img => {
-      img.style.maxWidth = '600px';
-      img.style.height = '1000px';
+
+    images.forEach(async (img) => {
+      if (img.src.includes('screenshot')) {
+
+        const imageContent = await fetch(`/api/alerts/${alert.value.id}/screenshot`);
+        const blob = await imageContent.blob();
+        const imgUrl = URL.createObjectURL(blob);
+
+        img.src = imgUrl;
+        // get current width and height
+        const width = img.width;
+        const height = img.height;
+        console.log(`Image dimensions: ${width}x${height}`);
+
+        // if image width is over 1200px then scale both width and height relatively until width is 1200px
+        if (width > 1200) {
+          const scale = 1200 / width;
+          img.style.width = `${width * scale}px`;
+          img.style.height = `${height * scale}px`;
+          img.width = `${width * scale}px`;
+          img.height = `${height * scale}px`;
+          console.log(`Scaled image dimensions: ${img.style.width}x${img.style.height}`);
+        }
+      }
     });
-    console.log(container.innerHTML)
 
     // Configure pdf options
     const options = {
       margin: 10,
       filename: `alert-report-${alert.value.id}.pdf`,
       image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2 },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      html2canvas: { scale: 3 },
+      jsPDF: { unit: 'mm', format: 'a3', orientation: 'portrait' }
     };
 
     html2pdf().from(container).set(options).save();
