@@ -15,7 +15,7 @@ app = typer.Typer(help="XSSpecter - CLI")
 
 @app.command()
 def spray(
-    url: str = typer.Argument(..., help="URL to spray payloads"),
+    url: str = typer.Argument(..., help="URL / file containing URLs to spray payloads"),
     depth: int = typer.Option(2, help="Maximum crawling depth"),
     max_pages: int = typer.Option(100, help="Maximum number of pages to crawl"),
     output: Path = typer.Option(
@@ -46,61 +46,83 @@ def spray(
     """
     console = Console()
     payload_generator = PayloadGenerator()
+    all_results = []
+    
+    urls_to_process = []
     
     if not validators.url(url):
-        console.print("[red]Invalid URL provided. Please enter a valid URL.[/red]")
-        raise typer.Exit(1)
-    
-    console.print(f"[green]Starting with the following configuration:[/green]")
-    console.print(f"URL: {url}")
-    if (crawl):
-        console.print(f"Crawling: [yellow]Enabled[/yellow]")
-        console.print(f"Max Depth: {depth}")
-        console.print(f"Max Pages: {max_pages}")
+        # Check if the URL is a file
+        if Path(url).is_file():
+            with open(url, 'r') as file:
+                urls = file.readlines()
+                urls_to_process = [line.strip() for line in urls if validators.url(line.strip())]
+            if not urls_to_process:
+                console.print("[red]No valid URLs found in the file.[/red]")
+                raise typer.Exit(1)
+            console.print(f"[green]Found {len(urls_to_process)} URLs in file to process[/green]")
+        else:
+            console.print("[red]Invalid URL provided. Please enter a valid URL.[/red]")
+            raise typer.Exit(1)
     else:
-        console.print(f"Crawling: [red]Disabled[/red]")
-    console.print(f"Output File: {output}")
-    
-    crawler = WebCrawler(base_url=url, max_depth=depth, max_pages=max_pages, should_crawl=crawl, proxy=proxy, insecure=insecure, headers=headers, cookies=cookies, thread_count=threads)
-    
-    # Create a single progress instance for the entire crawling process
-    progress = Progress(
-        SpinnerColumn(),
-        TextColumn("[progress.description]{task.description}"),
-        BarColumn(),
-        console=console
-    )
-    
-    with progress:
-        crawler.progress = progress  # Assign the progress instance to the crawler
-        crawler.crawl(url)
+        # Single URL case
+        urls_to_process = [url]
+
+    for current_url in urls_to_process:
+        console.print(f"[green]Processing URL: {current_url}[/green]")
+        console.print(f"[green]Starting with the following configuration:[/green]")
+        console.print(f"URL: {current_url}")
+        if (crawl):
+            console.print(f"Crawling: [yellow]Enabled[/yellow]")
+            console.print(f"Max Depth: {depth}")
+            console.print(f"Max Pages: {max_pages}")
+        else:
+            console.print(f"Crawling: [red]Disabled[/red]")
+        console.print(f"Output File: {output}")
         
-    console.print(f"\n[green]Scan completed! Found {len(crawler.results)} pages.[/green]")
+        crawler = WebCrawler(base_url=current_url, max_depth=depth, max_pages=max_pages, should_crawl=crawl, 
+                             proxy=proxy, insecure=insecure, headers=headers, cookies=cookies, thread_count=threads)
+        
+        # Create a single progress instance for the entire crawling process
+        progress = Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            BarColumn(),
+            console=console
+        )
+        
+        with progress:
+            crawler.progress = progress  # Assign the progress instance to the crawler
+            crawler.crawl(current_url)
+            
+        console.print(f"\n[green]Scan completed! Found {len(crawler.results)} pages.[/green]")
 
-    # identified forms
-    identified_forms = crawler.identified_forms
-    console.print(f"[green]Identified {len(identified_forms)} forms. Sending payloads...[/green]")
-    
-    # spray payloads
-    for target in identified_forms:
-        unique_id, payloads = payload_generator.get_payloads(target)
-        for payload in payloads:
-            payloadSprayObj = PayloadSpray(payload=payload, target=target, http_session=crawler.http_session)
-            result = payloadSprayObj.run()
-            if (result.status_code != 200):
-                console.print(f"[red]Payload [blue]{payload}[/blue] sent to [blue]{target['url']}[/blue] - Status {result.status_code}[/red]")
-            else:
-                console.print(f"[green]Payload [blue]{payload}[/blue] sent to [blue]{target['url']}[/blue] - Status {result.status_code}[/green]")
-            # Add result to crawler results
-            crawler.results.append({
-                'target': target['url'],
-                'payload': payload,
-                'status_code': result.status_code,
-                'response': result.text
-            })
-
-    # Export results
-    ResultExporter.export_json(crawler.results, output)
+        # identified forms
+        identified_forms = crawler.identified_forms
+        console.print(f"[green]Identified {len(identified_forms)} forms. Sending payloads...[/green]")
+        
+        # spray payloads
+        for target in identified_forms:
+            unique_id, payloads = payload_generator.get_payloads(target)
+            for payload in payloads:
+                payloadSprayObj = PayloadSpray(payload=payload, target=target, http_session=crawler.http_session)
+                result = payloadSprayObj.run()
+                if (result.status_code != 200):
+                    console.print(f"[red]Payload [blue]{payload}[/blue] sent to [blue]{target['url']}[/blue] - Status {result.status_code}[/red]")
+                else:
+                    console.print(f"[green]Payload [blue]{payload}[/blue] sent to [blue]{target['url']}[/blue] - Status {result.status_code}[/green]")
+                # Add result to crawler results
+                crawler.results.append({
+                    'target': target['url'],
+                    'payload': payload,
+                    'status_code': result.status_code,
+                    'response': result.text
+                })
+        
+        # Collect all results
+        all_results.extend(crawler.results)
+        
+    # Export combined results
+    ResultExporter.export_json(all_results, output)
     console.print(f"[green]Results exported to {output}[/green]")
 
 def main():

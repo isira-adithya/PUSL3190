@@ -3,3 +3,4 @@
 tests/logs/*.log
 tests/logs/*.json
 results.json
+urls.txt
