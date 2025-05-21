@@ -80,6 +80,7 @@ class WebCrawler:
             for link in soup.find_all('a', href=True):
                 href = link['href']
                 absolute_url = urljoin(url, href)
+                
                 if self.is_valid_url(absolute_url):
                     links.add(absolute_url)
             
@@ -129,7 +130,7 @@ class WebCrawler:
                 )
                 self.tasks[url] = task_id
 
-            response = self.http_session.get(url, timeout=10)
+            response = self.http_session.get(url, timeout=10, allow_redirects=False)
             response.raise_for_status()
 
             # Identify forms
