@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 from urllib.parse import urljoin, urlparse
 from datetime import datetime
 from rich.console import Console
-import validators
+from modules.custom_functions import CustomFunctions
 from rich.progress import Progress, TaskID
 from typing import Optional, Set, Dict
 from modules.html_parser import HTMLParser
@@ -64,12 +64,6 @@ class WebCrawler:
                 # Add cookie to session
                 self.http_session.cookies[ckey.strip()] = cval.strip()
         
-    def is_valid_url(self, url: str) -> bool:
-        """Check if URL is valid and belongs to the same domain."""
-        # Do not crawl external links which are out of scope! 
-        if not validators.url(url):
-            return False
-        return urlparse(url).netloc == urlparse(self.base_url).netloc
     
     def get_links(self, response: requests.Response, url) -> set:
         """Extract all links from a webpage."""
@@ -81,7 +75,8 @@ class WebCrawler:
                 href = link['href']
                 absolute_url = urljoin(url, href)
                 
-                if self.is_valid_url(absolute_url):
+                custom_funcs = CustomFunctions()
+                if custom_funcs.is_valid_url(self.base_url, absolute_url):
                     links.add(absolute_url)
             
             return links

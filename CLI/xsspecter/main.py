@@ -136,10 +136,12 @@ def spray(
             for target in identified_forms:
                 unique_id, payloads = payload_generator.get_payloads(target)
                 for payload in payloads:
-                    payloadSprayObj = PayloadSpray(payload=payload, target=target, http_session=crawler.http_session)
+                    payloadSprayObj = PayloadSpray(current_url=current_url, payload=payload, target=target, http_session=crawler.http_session)
                     try:
                         result = payloadSprayObj.run()
                     except Exception as e:
+                        if ('out of scope' in str(e)):
+                            continue
                         console.print(f"[red]Error sending payload [blue]{payload}[/blue] to [blue]{target['url']}[/blue]: {e}[/red]")
                         continue
                     if (result.status_code != 200):
